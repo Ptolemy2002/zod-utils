@@ -6,9 +6,9 @@ import { zodValidate, zodValidateWithErrors } from "src/index";
 
 export const zodAlwaysRejectMessage = "This schema always rejects";
 
-export const zodAlwaysReject = z.string().refine(() => false, { message: zodAlwaysRejectMessage });
+export const zodAlwaysReject = z.any().refine(() => false, { message: zodAlwaysRejectMessage });
 export const zodAlwaysRejectNested = z.object({
-    nested: z.string().refine(() => false, { message: zodAlwaysRejectMessage }),
+    nested: zodAlwaysReject
 });
 
 export const zodAlwaysAccept = z.any();
@@ -34,7 +34,7 @@ export function expectZodErrorStructure(err: ZodError | string, expected: ZodErr
     expect(err).toBe(zodErrorStructureString(expected));
 }
 
-type ZodExpectValidationOptions = {
+export type ZodExpectValidationOptions = {
     value?: unknown;
     failed?: boolean;
     expectedMessage?: ZodErrorStructure[] | null;

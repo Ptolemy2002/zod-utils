@@ -46,4 +46,13 @@ describe("interpretZodError", () => {
             { message: zodAlwaysRejectMessage, path: ["prefix"] },
         ]);
     });
+
+    it("adds the root path if the prefix is an empty string", () => {
+        const err = zodAlwaysReject.safeParse("some value").error!;
+        const result = interpretZodError(err, "");
+
+        expectZodErrorStructure(result, [
+            { message: zodAlwaysRejectMessage, path: ["(root)"] },
+        ]);
+    });
 });
