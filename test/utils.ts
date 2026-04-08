@@ -1,4 +1,4 @@
-import { toDotPath } from "zod/v4/core";
+import { $ZodError, toDotPath } from "zod/v4/core";
 import z, { ZodError, ZodType } from "zod";
 import { StandardSchemaV1 } from "zod/v4/core/standard-schema.cjs";
 import { interpretZodError } from "src/interpret";
@@ -12,6 +12,12 @@ export const zodAlwaysRejectNested = z.object({
 });
 
 export const zodAlwaysAccept = z.any();
+
+export const zodAllLowercaseMessage = "String must be all lowercase";
+export const zodAllUppercaseMessage = "String must be all uppercase";
+
+export const zodAllLowercase = z.string().refine((s) => s === s.toLowerCase(), { message: zodAllLowercaseMessage });
+export const zodAllUppercase = z.string().refine((s) => s === s.toUpperCase(), { message: zodAllUppercaseMessage });
 
 export type ZodErrorStructure = {
     message: string;
@@ -29,7 +35,7 @@ export function zodErrorStructureString(errs: ZodErrorStructure[]): string {
     return lines.join("\n");
 }
 
-export function expectZodErrorStructure(err: ZodError | string, expected: ZodErrorStructure[]) {
+export function expectZodErrorStructure(err: ZodError | $ZodError | string, expected: ZodErrorStructure[]) {
     if (typeof err !== "string") err = interpretZodError(err);
     expect(err).toBe(zodErrorStructureString(expected));
 }

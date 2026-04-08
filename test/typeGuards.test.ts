@@ -1,10 +1,15 @@
 import { isZodError } from "src/typeGuards";
 import { ZodError } from "zod";
+import { $ZodError } from "zod/v4/core";
 
 class TestError extends Error {}
 
 class TestZodError extends Error {
     name = "ZodError";
+}
+
+class Test$ZodError extends Error {
+    name = "$ZodError";
 }
 
 describe("isZodError", () => {
@@ -28,7 +33,15 @@ describe("isZodError", () => {
         expect(isZodError(new ZodError([]))).toBe(true);
     });
 
+    it("returns true for $ZodError instances", () => {
+        expect(isZodError(new $ZodError([]))).toBe(true);
+    });
+
     it("returns true for errors with name 'ZodError'", () => {
         expect(isZodError(new TestZodError())).toBe(true);
+    });
+
+    it("returns true for errors with name '$ZodError'", () => {
+        expect(isZodError(new Test$ZodError())).toBe(true);
     });
 });

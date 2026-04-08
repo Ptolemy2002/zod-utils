@@ -5,6 +5,7 @@ Various utilities for working with Zod schemas.
 - [Type Reference](docs/type-reference.md) - Complete type definitions for all exported types
 - `util` - Utilities for working with Zod schemas and errors
   - [clone](docs/util/clone.md) - Utility for cloning Zod schemas without affecting the original
+  - [function](docs/util/function.md) - Schema factory for validating callable functions with input/output schemas
   - [interpret](docs/util/interpret.md) - Utilities for formatting Zod errors as strings
   - [prefixIssuePath](docs/util/prefixIssuePath.md) - Utility for prepending a path prefix to a Zod issue
   - [typeGuards](docs/util/typeGuards.md) - Type guards for Zod-related values

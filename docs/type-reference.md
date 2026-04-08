@@ -2,6 +2,7 @@
 
 ```typescript
 import { ZodOptional, ZodSafeParseResult, ZodType } from 'zod';
+import { $ZodFunctionArgs, $ZodFunctionOut } from 'zod/v4/core';
 
 type ZodSafeParseable<O> = { safeParse: (data: unknown) => ZodSafeParseResult<O>; };
 
@@ -25,4 +26,11 @@ type ZodValidateWithErrorsOptions = {
 };
 
 type MaybeZodOptional<ZT extends ZodType> = ZT | ZodOptional<ZT>;
+
+type ZodFunctionParseOptions<In extends $ZodFunctionArgs, Out extends $ZodFunctionOut> = {
+    input?: In;
+    output?: Out;
+    inputPath?: PropertyKey | PropertyKey[];
+    outputPath?: PropertyKey | PropertyKey[];
+};
 ```
