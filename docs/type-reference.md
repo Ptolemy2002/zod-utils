@@ -33,4 +33,23 @@ type ZodFunctionParseOptions<In extends $ZodFunctionArgs, Out extends $ZodFuncti
     inputPath?: PropertyKey | PropertyKey[];
     outputPath?: PropertyKey | PropertyKey[];
 };
+
+type TrialErrorMode =
+    | "allow"
+    | "forbid"
+    | "require"
+    | ((e: unknown) => boolean)
+    | { require: (e: unknown) => boolean };
+
+type FunctionTrial<Input extends unknown[]> = {
+    id?: string;
+    input: Input;
+    outputSchema?: ZodType;
+    error?: TrialErrorMode;
+    errorStringify?: (e: unknown) => string;
+};
+
+type ZodFunctionSchemaOptions<In extends $ZodFunctionArgs, Out extends $ZodFunctionOut> = {
+    trials?: FunctionTrial<z.infer<In>>[];
+} & ZodFunctionParseOptions<In, Out>;
 ```

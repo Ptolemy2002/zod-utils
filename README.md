@@ -7,6 +7,7 @@ Various utilities for working with Zod schemas.
   - [clone](docs/util/clone.md) - Utility for cloning Zod schemas without affecting the original
   - [function](docs/util/function.md) - Schema factory for validating callable functions with input/output schemas
   - [interpret](docs/util/interpret.md) - Utilities for formatting Zod errors as strings
+  - [issuePathStartsWith](docs/util/issuePathStartsWith.md) - Utility for checking whether a Zod issue path starts with a given prefix
   - [prefixIssuePath](docs/util/prefixIssuePath.md) - Utility for prepending a path prefix to a Zod issue
   - [typeGuards](docs/util/typeGuards.md) - Type guards for Zod-related values
   - [validate](docs/util/validate.md) - Schema-wrapping factories for creating validators
