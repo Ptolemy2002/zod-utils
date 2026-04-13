@@ -27,6 +27,7 @@ export const zodAllLowercase = z.string().refine((s) => s === s.toLowerCase(), {
 export const zodAllUppercase = z.string().refine((s) => s === s.toUpperCase(), { message: zodAllUppercaseMessage });
 
 export type ZodIssueStructure = {
+    code?: string;
     message: string;
     path?: (PropertyKey | StandardSchemaV1.PathSegment)[];
     multiline?: boolean;
@@ -35,7 +36,7 @@ export type ZodIssueStructure = {
 export function zodIssueStructureString({ multiline=true, ...i}: ZodIssueStructure): string {
     const path = toDotPath(i.path ?? ["(root)"]);
 
-    let result = `✖ ${i.message}\n  → at ${path}`;
+    let result = `✖ ${i.code ? `[${i.code}] ` : ""}${i.message}\n  → at ${path}`;
 
     if (!multiline) {
         result = result.replace(/\n\s*→/g, " →");

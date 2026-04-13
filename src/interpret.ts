@@ -1,18 +1,29 @@
 import z from 'zod';
 import { prefixZodIssuePath } from './prefixIssuePath';
-import { InterpretableZodError, InterpretableZodIssue } from './types';
+import { InterpretableZodError, InterpretableZodIssue, ZodPath } from './types';
 
 export type InterpretZodErrorOptions = {
-    prefix?: PropertyKey | PropertyKey[];
+    prefix?: ZodPath;
     multiline?: boolean;
+    includeCode?: boolean;
 };
 
-export function interpretZodError(err: InterpretableZodError, options: PropertyKey | PropertyKey[] | InterpretZodErrorOptions = ""): string {
+export function interpretZodError(err: InterpretableZodError, options: ZodPath | InterpretZodErrorOptions = ""): string {
     if (typeof options !== "object" || Array.isArray(options)) options = { prefix: options };
-    const { multiline=true, prefix="" } = options;
+    const { multiline=true, includeCode=false, prefix="" } = options;
 
     const modifiedErr = {
-        issues: err.issues.map(issue => prefixZodIssuePath(issue, prefix))
+        issues: err.issues.map(issue => {
+            const modifiedIssue = prefixZodIssuePath(issue, prefix);
+            if (includeCode && modifiedIssue.code) {
+                return {
+                    ...modifiedIssue,
+                    message: `[${modifiedIssue.code}] ${modifiedIssue.message}`
+                }
+            }
+
+            return modifiedIssue;
+        })
     };
 
     let result = z.prettifyError(modifiedErr);
@@ -24,6 +35,6 @@ export function interpretZodError(err: InterpretableZodError, options: PropertyK
     return result;
 }
 
-export function interpretZodIssue(issue: InterpretableZodIssue, options: PropertyKey | PropertyKey[] | InterpretZodErrorOptions = ""): string {
+export function interpretZodIssue(issue: InterpretableZodIssue, options: ZodPath | InterpretZodErrorOptions = ""): string {
     return interpretZodError({ issues: [issue] }, options);
 }

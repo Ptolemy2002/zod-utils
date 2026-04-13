@@ -6,11 +6,13 @@ import z from 'zod';
 import { ZodArray, ZodType, ZodUnknown } from 'zod';
 import { $ZodFunctionArgs, $ZodFunctionOut } from 'zod/v4/core';
 
+type ZodPath = PropertyKey | PropertyKey[];
+
 type ZodFunctionParseOptions<In extends $ZodFunctionArgs, Out extends $ZodFunctionOut> = {
     input?: In;
     output?: Out;
-    inputPath?: PropertyKey | PropertyKey[];
-    outputPath?: PropertyKey | PropertyKey[];
+    inputPath?: ZodPath;
+    outputPath?: ZodPath;
 };
 
 type TrialErrorMode =
@@ -50,8 +52,8 @@ ZodErrors thrown by the function itself during execution (rather than produced b
 - `options` (`ZodFunctionParseOptions<In, Out>`, optional): Configuration for input/output validation.
   - `input` (`In`, optional): A Zod tuple or array schema to validate the function's arguments. Defaults to `z.array(z.unknown())`.
   - `output` (`Out`, optional): A Zod schema to validate the function's return value. Defaults to `z.unknown()`.
-  - `inputPath` (`PropertyKey | PropertyKey[]`, optional): Path prefix prepended to argument validation errors. Defaults to `"args"`.
-  - `outputPath` (`PropertyKey | PropertyKey[]`, optional): Path prefix prepended to return value validation errors. Defaults to `"return"`.
+  - `inputPath` (`ZodPath`, optional): Path prefix prepended to argument validation errors. Defaults to `"args"`.
+  - `outputPath` (`ZodPath`, optional): Path prefix prepended to return value validation errors. Defaults to `"return"`.
 
 **Returned function**
 - `...args` (`z.infer<In>`): Arguments forwarded to the original function after input validation.
@@ -75,8 +77,8 @@ If `trials` are provided, the function is called once per trial at parse time to
 - `options` (`ZodFunctionSchemaOptions<In, Out>`, optional): Configuration for input/output validation and trials.
   - `input` (`In`, optional): A Zod tuple or array schema to validate the function's arguments. Defaults to `z.array(z.unknown())`.
   - `output` (`Out`, optional): A Zod schema to validate the function's return value. Defaults to `z.unknown()`.
-  - `inputPath` (`PropertyKey | PropertyKey[]`, optional): Path prefix prepended to argument validation errors. Defaults to `"args"`.
-  - `outputPath` (`PropertyKey | PropertyKey[]`, optional): Path prefix prepended to return value validation errors. Defaults to `"return"`.
+  - `inputPath` (`ZodPath`, optional): Path prefix prepended to argument validation errors. Defaults to `"args"`.
+  - `outputPath` (`ZodPath`, optional): Path prefix prepended to return value validation errors. Defaults to `"return"`.
   - `trials` (`FunctionTrial<z.infer<In>>[]`, optional): A list of test cases to run against the function at parse time. Defaults to `[]`. Each trial has:
     - `id` (`string`, optional): Identifier used as the first segment of each trial's issue paths. Defaults to `"trial_N"` where `N` is the trial's index.
     - `input` (`z.infer<In>`): The arguments to pass to the function for this trial.

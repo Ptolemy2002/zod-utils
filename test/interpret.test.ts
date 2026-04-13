@@ -65,6 +65,15 @@ describe("interpretZodError", () => {
             { message: zodAlwaysRejectMultipleMessage2, path: ["(root)"], multiline: false },
         ]);
     });
+
+    it("includes the code in the message if includeCode is set to true", () => {
+        const err = zodAlwaysReject.safeParse("some value").error!;
+        const result = interpretZodError(err, { includeCode: true });
+
+        expectZodErrorStructure(result, [
+            { code: "custom", message: `${zodAlwaysRejectMessage}`, path: ["(root)"] },
+        ]);
+    });
 });
 
 describe("interpretZodIssue", () => {

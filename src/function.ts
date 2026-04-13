@@ -5,6 +5,7 @@ import { prefixZodIssuePath } from "./prefixIssuePath";
 import { issuePathStartsWith } from "./issuePathStartsWith";
 import isCallable from "is-callable";
 import { interpretZodError } from "./interpret";
+import { ZodPath } from "./types";
 
 export type TrialErrorMode =
     | "allow"
@@ -24,8 +25,8 @@ export type FunctionTrial<Input extends unknown[]> = {
 export type ZodFunctionParseOptions<In extends $ZodFunctionArgs, Out extends $ZodFunctionOut> = {
     input?: In;
     output?: Out;
-    inputPath?: PropertyKey | PropertyKey[];
-    outputPath?: PropertyKey | PropertyKey[];
+    inputPath?: ZodPath;
+    outputPath?: ZodPath;
 };
 
 export type ZodFunctionSchemaOptions<In extends $ZodFunctionArgs, Out extends $ZodFunctionOut> = {

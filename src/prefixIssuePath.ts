@@ -1,8 +1,8 @@
-import { InterpretableZodIssue } from "./types";
+import { InterpretableZodIssue, ZodPath } from "./types";
 
 export function prefixZodIssuePath<
     I extends InterpretableZodIssue
->(issue: I, prefix: PropertyKey | PropertyKey[]): I {
+>(issue: I, prefix: ZodPath): I {
     if (!Array.isArray(prefix)) prefix = [prefix];
 
     const newPath: PropertyKey[] = [...prefix, ...(issue.path ?? [])]

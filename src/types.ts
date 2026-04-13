@@ -23,7 +23,10 @@ export type ZodValidateWithErrorsOptions = {
 
 export type MaybeZodOptional<ZT extends ZodType> = ZT | ZodOptional<ZT>;
 
+export type ZodPath = PropertyKey | PropertyKey[];
+
 export type InterpretableZodIssue = Readonly<{
+    code?: string;
     message: string;
     path?: PropertyKey[];
 }>;
