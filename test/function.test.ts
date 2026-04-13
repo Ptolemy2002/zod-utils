@@ -401,7 +401,8 @@ describe("zodFunctionSchema", () => {
                         message: `Unexpected Error: ${
                             zodErrorStructureString([{
                                 message: "Inner ZodError",
-                                path: ["test"]
+                                path: ["test"],
+                                multiline: false
                             }])
                         }`,
                         path: ["myTrial"]

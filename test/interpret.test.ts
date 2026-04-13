@@ -1,5 +1,5 @@
-import { interpretZodError } from "src/interpret";
-import { expectZodErrorStructure, zodAlwaysReject, zodAlwaysRejectMessage } from "./utils";
+import { interpretZodError, interpretZodIssue } from "src/interpret";
+import { expectZodErrorStructure, expectZodIssueStructure, zodAlwaysReject, zodAlwaysRejectMessage, zodAlwaysRejectMultiple, zodAlwaysRejectMultipleMessage1, zodAlwaysRejectMultipleMessage2 } from "./utils";
 
 describe("interpretZodError", () => {
     it("correctly interprets an error at the root level", () => {
@@ -54,5 +54,27 @@ describe("interpretZodError", () => {
         expectZodErrorStructure(result, [
             { message: zodAlwaysRejectMessage, path: ["(root)"] },
         ]);
+    });
+
+    it("reports message and path on the same line if multiline is set to false", () => {
+        const err = zodAlwaysRejectMultiple.safeParse("some value").error!;
+        const result = interpretZodError(err, { multiline: false });
+
+        expectZodErrorStructure(result, [
+            { message: zodAlwaysRejectMultipleMessage1, path: ["(root)"], multiline: false },
+            { message: zodAlwaysRejectMultipleMessage2, path: ["(root)"], multiline: false },
+        ]);
+    });
+});
+
+describe("interpretZodIssue", () => {
+    it("delegates to interpretZodError with the issue wrapped in an error object", () => {
+        const issue = zodAlwaysReject.safeParse("some value").error!.issues[0]!;
+        const result = interpretZodIssue(issue);
+
+        expectZodIssueStructure(result, {
+            message: zodAlwaysRejectMessage,
+            path: ["(root)"]
+        });
     });
 });

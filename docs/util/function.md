@@ -87,7 +87,7 @@ If `trials` are provided, the function is called once per trial at parse time to
       - `"require"`: If no error is thrown, adds an `"Unexpected Success"` issue. Any thrown error is accepted.
       - A function `(e: unknown) => boolean`: If the function returns `false` for the thrown error, adds an `"Unexpected Error: ..."` issue.
       - `{ require: (e: unknown) => boolean }`: If the function returns `false` for the thrown error, adds an `"Unexpected Error: ..."` issue. Additionally, if no error is thrown, adds an `"Unexpected Success"` issue.
-    - `errorStringify` (`(e: unknown) => string`, optional): Custom serializer for unexpected errors used in issue messages. Defaults to `interpretZodError` for `ZodError` instances, `e.message` for `Error` instances, and `String(e)` for all other values.
+    - `errorStringify` (`(e: unknown) => string`, optional): Custom serializer for unexpected errors used in issue messages. Defaults to `interpretZodError(e, { multiline: false })` for `ZodError`-like instances (producing a message where each issue and its path is on a single line), `e.message` for `Error` instances, and `String(e)` for all other values.
 
 **Returned schema (parsed function)**
 - `...args` (`z.infer<In>`): Arguments forwarded to the original function after input validation.

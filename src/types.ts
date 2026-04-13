@@ -22,3 +22,12 @@ export type ZodValidateWithErrorsOptions = {
 };
 
 export type MaybeZodOptional<ZT extends ZodType> = ZT | ZodOptional<ZT>;
+
+export type InterpretableZodIssue = Readonly<{
+    message: string;
+    path?: PropertyKey[];
+}>;
+
+export type InterpretableZodError = Readonly<{
+    issues: InterpretableZodIssue[];
+}>;

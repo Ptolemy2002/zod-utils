@@ -27,6 +27,20 @@ type ZodValidateWithErrorsOptions = {
 
 type MaybeZodOptional<ZT extends ZodType> = ZT | ZodOptional<ZT>;
 
+type InterpretableZodIssue = Readonly<{
+    message: string;
+    path?: PropertyKey[];
+}>;
+
+type InterpretableZodError = Readonly<{
+    issues: InterpretableZodIssue[];
+}>;
+
+type InterpretZodErrorOptions = {
+    prefix?: PropertyKey | PropertyKey[];
+    multiline?: boolean;
+};
+
 type ZodFunctionParseOptions<In extends $ZodFunctionArgs, Out extends $ZodFunctionOut> = {
     input?: In;
     output?: Out;

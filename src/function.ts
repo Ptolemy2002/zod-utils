@@ -117,7 +117,7 @@ export function zodFunctionSchema<
                         outputSchema=z.unknown(),
                         error,
                         errorStringify=(e) => {
-                            if (isZodError(e)) return interpretZodError(e);
+                            if (isZodError(e)) return interpretZodError(e, { multiline: false });
                             if (e instanceof Error) return e.message;
                             return String(e);
                         }

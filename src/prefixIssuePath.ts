@@ -1,9 +1,11 @@
-import z from "zod";
+import { InterpretableZodIssue } from "./types";
 
-export function prefixZodIssuePath(issue: z.core.$ZodIssue, prefix: PropertyKey | PropertyKey[]): z.core.$ZodIssue {
+export function prefixZodIssuePath<
+    I extends InterpretableZodIssue
+>(issue: I, prefix: PropertyKey | PropertyKey[]): I {
     if (!Array.isArray(prefix)) prefix = [prefix];
 
-    const newPath: PropertyKey[] = [...prefix, ...issue.path]
+    const newPath: PropertyKey[] = [...prefix, ...(issue.path ?? [])]
         .filter(p => typeof p !== "string" || p.length > 0)
     ;
     
