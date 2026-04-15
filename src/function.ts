@@ -5,29 +5,7 @@ import { prefixZodIssuePath } from "./prefixIssuePath";
 import { issuePathStartsWith } from "./issuePathStartsWith";
 import isCallable from "is-callable";
 import { interpretZodError } from "./interpret";
-import { ZodPath } from "./types";
-
-export type TrialErrorMode =
-    | "allow"
-    | "forbid"
-    | "require"
-    | ((e: unknown) => boolean)
-    | { require: (e: unknown) => boolean };
-
-export type FunctionTrial<Input extends unknown[]> = {
-    id?: string;
-    input: Input;
-    outputSchema?: ZodType;
-    error?: TrialErrorMode;
-    errorStringify?: (e: unknown) => string;
-};
-
-export type ZodFunctionParseOptions<In extends $ZodFunctionArgs, Out extends $ZodFunctionOut> = {
-    input?: In;
-    output?: Out;
-    inputPath?: ZodPath;
-    outputPath?: ZodPath;
-};
+import { ZodFunctionParseOptions, FunctionTrial } from "./types";
 
 export type ZodFunctionSchemaOptions<In extends $ZodFunctionArgs, Out extends $ZodFunctionOut> = {
     trials?: FunctionTrial<z.infer<In>>[];

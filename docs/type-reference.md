@@ -22,8 +22,7 @@ type ZodValidatorWithErrors<O> = (v: unknown) => ZodValidationResult<O>;
 
 type ZodValidateWithErrorsOptions = {
     _throw?: boolean;
-    prefix?: string | string[];
-};
+} & InterpretZodErrorOptions;
 
 type MaybeZodOptional<ZT extends ZodType> = ZT | ZodOptional<ZT>;
 

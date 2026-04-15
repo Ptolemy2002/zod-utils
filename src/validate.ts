@@ -14,7 +14,7 @@ export function zodValidateWithErrors<O>(
     p: t.ZodSafeParseable<O>,
     {
         _throw = false,
-        prefix = "",
+        ...options
     }: t.ZodValidateWithErrorsOptions = {},
 ): t.ZodValidatorWithErrors<O> {
     return (_v) => {
@@ -22,6 +22,6 @@ export function zodValidateWithErrors<O>(
         if (success) return { success, value: v };
         if (_throw) throw error;
 
-        return { success, error: interpretZodError(error, prefix) };
+        return { success, error: interpretZodError(error, options) };
     };
 }

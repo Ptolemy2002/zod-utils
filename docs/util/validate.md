@@ -18,10 +18,17 @@ type ZodValidationResult<O> = {
 
 type ZodValidatorWithErrors<O> = (v: unknown) => ZodValidationResult<O>;
 
+type ZodPath = PropertyKey | PropertyKey[];
+
+type InterpretZodErrorOptions = {
+    prefix?: ZodPath;
+    multiline?: boolean;
+    includeCode?: boolean;
+};
+
 type ZodValidateWithErrorsOptions = {
     _throw?: boolean;
-    prefix?: string | string[];
-};
+} & InterpretZodErrorOptions;
 ```
 
 # zodValidate
@@ -54,7 +61,9 @@ Factory that wraps a Zod schema and returns a validator that reports success or 
 - `p` (`ZodSafeParseable<O>`): The schema to validate against.
 - `options` (`ZodValidateWithErrorsOptions`, optional): Configuration for the returned validator.
   - `_throw` (`boolean`, optional): When `true`, the returned validator throws the `ZodError` rather than returning a failure result. Defaults to `false`.
-  - `prefix` (`string | string[]`, optional): Path prefix forwarded to `interpretZodError` for error messages. Defaults to `""`.
+  - `prefix` (`ZodPath`, optional): Path prefix forwarded to `interpretZodError` for error messages. Defaults to `""`.
+  - `multiline` (`boolean`, optional): Forwarded to `interpretZodError`. When `true` (default), each issue's path appears on its own line. When `false`, the path arrow is on the same line as the message.
+  - `includeCode` (`boolean`, optional): Forwarded to `interpretZodError`. When `true`, each issue's `code` is prepended to the message in brackets. Defaults to `false`.
 
 **Returned validator**
 - `v` (`unknown`): The value to validate.

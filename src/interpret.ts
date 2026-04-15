@@ -1,12 +1,6 @@
 import z from 'zod';
 import { prefixZodIssuePath } from './prefixIssuePath';
-import { InterpretableZodError, InterpretableZodIssue, ZodPath } from './types';
-
-export type InterpretZodErrorOptions = {
-    prefix?: ZodPath;
-    multiline?: boolean;
-    includeCode?: boolean;
-};
+import { InterpretableZodError, InterpretableZodIssue, ZodPath, InterpretZodErrorOptions } from './types';
 
 export function interpretZodError(err: InterpretableZodError, options: ZodPath | InterpretZodErrorOptions = ""): string {
     if (typeof options !== "object" || Array.isArray(options)) options = { prefix: options };
