@@ -436,12 +436,37 @@ describe("zodFunctionSchema", () => {
             });
         });
     });
+
+    it("accepts pre-transform trial inputs and validates against transformed outputs", () => {
+        const schema = zodFunctionSchema({
+            input: z.tuple([z.coerce.number()]),
+            output: z.number().transform(n => n * 2),
+            trials: [{ input: ["2"], outputSchema: z.literal(6) }]
+        });
+
+        const func = schema.parse((n: number) => n + 1);
+        expect(func("4")).toBe(10);
+    });
 });
 
 describe("zodValidatedFunction", () => {
     it("accepts any arbitrary function by default", () => {
         const validatedFunc = zodValidatedFunction((s: string) => s.toUpperCase() + s.toLowerCase());
         expect(validatedFunc("hello")).toBe("HELLOhello");
+    });
+
+    it("passes coerced/transformed arguments to the function and returns the coerced/transformed output", () => {
+        const received: unknown[] = [];
+        const validatedFunc = zodValidatedFunction((...args: unknown[]) => {
+            received.push(...args);
+            return "5";
+        }, {
+            input: z.tuple([z.coerce.number(), z.string().transform(s => s.length)]),
+            output: z.coerce.number()
+        });
+
+        expect(validatedFunc("3", "abc")).toBe(5);
+        expect(received).toEqual([3, 3]);
     });
 
     it("registers an argument validation error after an already successful call (by resetting internal reachedCaller state)", () => {

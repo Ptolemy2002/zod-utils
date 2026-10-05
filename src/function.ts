@@ -8,7 +8,7 @@ import { interpretZodError } from "./interpret";
 import { ZodFunctionParseOptions, FunctionTrial } from "./types";
 
 export type ZodFunctionSchemaOptions<In extends $ZodFunctionArgs, Out extends $ZodFunctionOut> = {
-    trials?: FunctionTrial<z.infer<In>>[];
+    trials?: FunctionTrial<z.input<In>>[];
 } & ZodFunctionParseOptions<In, Out>;
 
 export function zodValidatedFunction<
@@ -33,14 +33,17 @@ export function zodValidatedFunction<
     }
 
     const functionFactory = z.function({ input, output });
-    const wrappedFunction = (setReachedCaller: (v: boolean) => void, setFinishedCall: (v: boolean) => void, ...args: z.infer<In>) => {
+    // Zod parses the arguments before calling the implementation, so any coercions or
+    // transforms in the input schema have already been applied to these args.
+    const wrappedFunction = (setReachedCaller: (v: boolean) => void, setFinishedCall: (v: boolean) => void, ...args: z.output<In>) => {
         setReachedCaller(true);
         const result = func(...args);
         setFinishedCall(true);
         return result;
     };
 
-    return (...args: z.infer<In>) => {
+    // Callers provide pre-parse values (z.input), and receive the parsed return value (z.output).
+    return (...args: z.input<In>): z.output<Out> => {
         // This is how we will differentiate between argument and
         // parameter validation errors
         let reachedCaller = false;
@@ -49,7 +52,7 @@ export function zodValidatedFunction<
         try {
             const implementedFunction = functionFactory.implement(
                 (
-                    (...args: z.infer<In>) => wrappedFunction(
+                    (...args: z.output<In>) => wrappedFunction(
                         (v) => (reachedCaller = v),
                         (v) => (finishedCall = v),
                         ...args
@@ -57,7 +60,7 @@ export function zodValidatedFunction<
                 ) as any
             );
 
-            return implementedFunction(...args as any) as z.infer<Out>;
+            return implementedFunction(...args as any) as z.output<Out>;
         } catch (e: unknown) {
             if (isZodError(e)) {
                 if (!reachedCaller || finishedCall) e = new ZodError(e.issues.map(i => prefixZodIssuePath(i, reachedCaller ? outputPath : inputPath)));

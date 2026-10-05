@@ -67,6 +67,6 @@ type FunctionTrial<Input extends unknown[]> = {
 };
 
 type ZodFunctionSchemaOptions<In extends $ZodFunctionArgs, Out extends $ZodFunctionOut> = {
-    trials?: FunctionTrial<z.infer<In>>[];
+    trials?: FunctionTrial<z.input<In>>[];
 } & ZodFunctionParseOptions<In, Out>;
 ```

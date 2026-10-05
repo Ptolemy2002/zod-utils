@@ -31,7 +31,7 @@ type FunctionTrial<Input extends unknown[]> = {
 };
 
 type ZodFunctionSchemaOptions<In extends $ZodFunctionArgs, Out extends $ZodFunctionOut> = {
-    trials?: FunctionTrial<z.infer<In>>[];
+    trials?: FunctionTrial<z.input<In>>[];
 } & ZodFunctionParseOptions<In, Out>;
 ```
 
@@ -40,9 +40,11 @@ type ZodFunctionSchemaOptions<In extends $ZodFunctionArgs, Out extends $ZodFunct
 function zodValidatedFunction<
     In extends $ZodFunctionArgs = ZodArray<ZodUnknown>,
     Out extends $ZodFunctionOut = ZodUnknown,
->(func: unknown, options?: ZodFunctionParseOptions<In, Out>): (...args: z.infer<In>) => z.infer<Out>
+>(func: unknown, options?: ZodFunctionParseOptions<In, Out>): (...args: z.input<In>) => z.output<Out>
 ```
 Validates that `func` is callable and wraps it so that every call validates arguments against `input` and the return value against `output`. Throws a `ZodError` at call time (not creation time) if validation fails, with each issue's path prefixed by `inputPath` or `outputPath` as appropriate. Throws a `ZodError` immediately (before returning the wrapper) if `func` is not callable.
+
+If `input` or `output` coerce or transform their values, the original function receives the parsed (output) arguments, and the wrapper returns the parsed (output) return value.
 
 ZodErrors thrown by the function itself during execution (rather than produced by input/output schema validation) are rethrown unchanged.
 
@@ -56,17 +58,17 @@ ZodErrors thrown by the function itself during execution (rather than produced b
   - `outputPath` (`ZodPath`, optional): Path prefix prepended to return value validation errors. Defaults to `"return"`.
 
 **Returned function**
-- `...args` (`z.infer<In>`): Arguments forwarded to the original function after input validation.
+- `...args` (`z.input<In>`): Arguments forwarded to the original function after input validation. The function receives the parsed values, so any coercions or transforms in `input` are applied first.
 
 ## Returns
-- `(...args: z.infer<In>) => z.infer<Out>`: A wrapper function that validates arguments and return value on every call, rethrowing any non-Zod errors and any ZodErrors thrown during execution unchanged.
+- `(...args: z.input<In>) => z.output<Out>`: A wrapper function that validates arguments and return value on every call, rethrowing any non-Zod errors and any ZodErrors thrown during execution unchanged.
 
 # zodFunctionSchema
 ```typescript
 function zodFunctionSchema<
     In extends $ZodFunctionArgs = ZodArray<ZodUnknown>,
     Out extends $ZodFunctionOut = ZodUnknown
->(options?: ZodFunctionSchemaOptions<In, Out>): ZodPipe<z.ZodAny, z.ZodTransform<(...args: z.core.output<In>) => z.core.output<Out>, any>>
+>(options?: ZodFunctionSchemaOptions<In, Out>): ZodPipe<z.ZodAny, z.ZodTransform<(...args: z.input<In>) => z.output<Out>, any>>
 ```
 Factory that returns a Zod schema which parses any value into a validated wrapper function. When the schema's `.parse()` result is called, it validates the arguments against `input` and the return value against `output`, throwing a `ZodError` with a prefixed path on failure. Throws a `ZodError` at parse time if the value is not callable.
 
@@ -79,9 +81,9 @@ If `trials` are provided, the function is called once per trial at parse time to
   - `output` (`Out`, optional): A Zod schema to validate the function's return value. Defaults to `z.unknown()`.
   - `inputPath` (`ZodPath`, optional): Path prefix prepended to argument validation errors. Defaults to `"args"`.
   - `outputPath` (`ZodPath`, optional): Path prefix prepended to return value validation errors. Defaults to `"return"`.
-  - `trials` (`FunctionTrial<z.infer<In>>[]`, optional): A list of test cases to run against the function at parse time. Defaults to `[]`. Each trial has:
+  - `trials` (`FunctionTrial<z.input<In>>[]`, optional): A list of test cases to run against the function at parse time. Defaults to `[]`. Each trial has:
     - `id` (`string`, optional): Identifier used as the first segment of each trial's issue paths. Defaults to `"trial_N"` where `N` is the trial's index.
-    - `input` (`z.infer<In>`): The arguments to pass to the function for this trial.
+    - `input` (`z.input<In>`): The arguments to pass to the function for this trial. These are pre-parse values, so they go through any coercions or transforms in `input`.
     - `outputSchema` (`ZodType`, optional): A schema to validate the trial's return value against. Defaults to `z.unknown()`.
     - `error` (`TrialErrorMode`, optional): Controls whether the trial is expected to throw. Defaults to `"forbid"`.
       - `"forbid"` (default): Any thrown error adds an `"Unexpected Error: ..."` issue.
@@ -92,7 +94,7 @@ If `trials` are provided, the function is called once per trial at parse time to
     - `errorStringify` (`(e: unknown) => string`, optional): Custom serializer for unexpected errors used in issue messages. Defaults to `interpretZodError(e, { multiline: false })` for `ZodError`-like instances (producing a message where each issue and its path is on a single line), `e.message` for `Error` instances, and `String(e)` for all other values.
 
 **Returned schema (parsed function)**
-- `...args` (`z.infer<In>`): Arguments forwarded to the original function after input validation.
+- `...args` (`z.input<In>`): Arguments forwarded to the original function after input validation. The function receives the parsed values, so any coercions or transforms in `input` are applied first.
 
 ## Returns
-- `ZodPipe<z.ZodAny, z.ZodTransform<(...args: z.core.output<In>) => z.core.output<Out>, any>>`: A Zod schema that, when parsed with a callable value, produces a wrapped function. Calling the wrapped function validates its arguments and return value, rethrowing any non-Zod errors unchanged.
+- `ZodPipe<z.ZodAny, z.ZodTransform<(...args: z.input<In>) => z.output<Out>, any>>`: A Zod schema that, when parsed with a callable value, produces a wrapped function. Calling the wrapped function validates its arguments and return value, rethrowing any non-Zod errors unchanged.
