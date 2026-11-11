@@ -1,4 +1,4 @@
-import { isZodError } from "src/typeGuards";
+import { isZodError } from "src/index";
 import { ZodError } from "zod";
 import { $ZodError } from "zod/v4/core";
 

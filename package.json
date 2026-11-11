@@ -39,9 +39,11 @@
         "ts-patch": "^3.3.0",
         "tsconfig-paths": "^4.2.0",
         "typescript-transform-paths": "^3.5.3",
+        "valibot": "^1.5.0",
         "zod": "^4.3.6"
     },
     "dependencies": {
+        "@standard-schema/spec": "^1.1.0",
         "is-callable": "^1.2.7"
     }
 }

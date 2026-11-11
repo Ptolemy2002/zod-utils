@@ -1,7 +1,7 @@
 import { toDotPath } from "zod/v4/core";
 import z, { ZodType } from "zod";
 import { StandardSchemaV1 } from "zod/v4/core/standard-schema.cjs";
-import { interpretZodError, interpretZodIssue } from "src/interpret";
+import { interpretZodError, interpretZodIssue } from "src/index";
 import { InterpretableZodError, InterpretableZodIssue, zodValidate, zodValidateWithErrors } from "src/index";
 
 export const zodAlwaysRejectMessage = "This schema always rejects";

@@ -1,5 +1,5 @@
-import { prefixZodIssuePath } from "src/prefixIssuePath";
-import { zodAlwaysReject, zodAlwaysRejectNested } from "./utils";
+import { prefixIssuePath, prefixZodIssuePath } from "src/index";
+import { zodAlwaysReject, zodAlwaysRejectNested } from "../utils";
 import { $ZodIssue } from "zod/v4/core";
 
 describe("prefixZodIssuePath", () => {
@@ -43,5 +43,10 @@ describe("prefixZodIssuePath", () => {
         const issue = { code: "custom", message: "An error occurred" } as $ZodIssue;
         const prefixedIssue = prefixZodIssuePath(issue, "prefix");
         expect(prefixedIssue.path).toEqual(["prefix"]);
+    });
+
+    it("normalizes Standard Schema `{ key }` path segments to plain keys", () => {
+        const prefixedIssue = prefixIssuePath({ message: "An error occurred", path: [{ key: "nested" }, { key: 0 }] }, "prefix");
+        expect(prefixedIssue.path).toEqual(["prefix", "nested", 0]);
     });
 });

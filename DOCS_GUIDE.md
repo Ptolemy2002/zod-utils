@@ -8,7 +8,9 @@ Documentation lives in `./docs/`. The subdirectory mirrors the `./src/` structur
 
 | What you're documenting | Where to put the doc |
 |---|---|
-| A standalone utility function | `docs/util/<name>.md` |
+| A library-neutral (Standard Schema) utility | `docs/core/<name>.md` |
+| A Zod-specific utility | `docs/zod/<name>.md` |
+| A utility for another supported schema library | `docs/<library>/<name>.md` |
 | A class | `docs/class/<name>.md` |
 | A token class | `docs/class/token/<name>.md` |
 | A lookaround token class | `docs/class/token/lookaround/<name>.md` |
@@ -39,7 +41,7 @@ import { CloneDepth } from "@ptolemy2002/immutability-utils";
 
 The relative path to `type-reference.md` changes by nesting depth:
 - `docs/*.md` → `./type-reference.md`
-- `docs/util/*.md` → `../type-reference.md`
+- `docs/core/*.md`, `docs/zod/*.md` → `../type-reference.md`
 - `docs/class/*.md` → `../type-reference.md`
 - `docs/class/token/*.md` → `../../type-reference.md`
 - `docs/class/token/lookaround/*.md` → `../../../type-reference.md`

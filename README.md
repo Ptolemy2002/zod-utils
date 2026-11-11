@@ -1,16 +1,26 @@
 # Zod Utils
-Various utilities for working with Zod schemas.
+Various utilities for working with Zod schemas and, through the [Standard Schema](https://standardschema.dev) interface, any other schema library that implements it (Valibot, ArkType, Effect Schema, ...).
+
+The utilities are built on a small adapter layer: each supported library provides a `SchemaAdapter`, and `createSchemaUtils` turns it into the full set of utilities. The library-neutral versions are exported without a prefix (`validate`, `functionSchema`, ...), and the Zod versions with a `zod` prefix (`zodValidate`, `zodFunctionSchema`, ...).
 
 ## Table of Contents
 - [Type Reference](docs/type-reference.md) - Complete type definitions for all exported types
-- `util` - Utilities for working with Zod schemas and errors
-  - [clone](docs/util/clone.md) - Utility for cloning Zod schemas without affecting the original
-  - [function](docs/util/function.md) - Schema factory for validating callable functions with input/output schemas
-  - [interpret](docs/util/interpret.md) - Utilities for formatting Zod errors as strings
-  - [issuePathStartsWith](docs/util/issuePathStartsWith.md) - Utility for checking whether a Zod issue path starts with a given prefix
-  - [prefixIssuePath](docs/util/prefixIssuePath.md) - Utility for prepending a path prefix to a Zod issue
-  - [typeGuards](docs/util/typeGuards.md) - Type guards for Zod-related values
-  - [validate](docs/util/validate.md) - Schema-wrapping factories for creating validators
+- `core` - Library-neutral utilities that work with any Standard Schema
+  - [adapter](docs/core/adapter.md) - The `SchemaAdapter` contract, `createSchemaUtils`, and the library-neutral `standardAdapter`
+  - [validate](docs/core/validate.md) - Schema-wrapping factories for creating validators (sync and async)
+  - [function](docs/core/function.md) - Validated function wrappers and function schemas with trials (sync and async)
+  - [interpret](docs/core/interpret.md) - Utilities for formatting validation errors as strings
+  - [path](docs/core/path.md) - Utilities for normalizing, comparing, and prefixing issue paths
+  - [error](docs/core/error.md) - `SchemaValidationError`, `AsyncSchemaError`, and related type guards
+- `zod` - Zod-specific utilities and the Zod adapter
+  - [adapter](docs/zod/adapter.md) - The Zod adapter, `zodUtils`, and compatibility aliases
+  - [validate](docs/zod/validate.md) - Zod versions of the validator factories
+  - [function](docs/zod/function.md) - Zod versions of the function utilities
+  - [clone](docs/zod/clone.md) - Utility for cloning Zod schemas without affecting the original
+  - [typeGuards](docs/zod/typeGuards.md) - Type guards for Zod-related values
+
+## Dependencies
+- `@standard-schema/spec` (types only)
 
 ## Peer Dependencies
 - `zod^4.3.6`

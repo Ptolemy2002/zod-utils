@@ -1,5 +1,5 @@
-import { interpretZodError, interpretZodIssue } from "src/interpret";
-import { expectZodErrorStructure, expectZodIssueStructure, zodAlwaysReject, zodAlwaysRejectMessage, zodAlwaysRejectMultiple, zodAlwaysRejectMultipleMessage1, zodAlwaysRejectMultipleMessage2 } from "./utils";
+import { interpretZodError, interpretZodIssue } from "src/index";
+import { expectZodErrorStructure, expectZodIssueStructure, zodAlwaysReject, zodAlwaysRejectMessage, zodAlwaysRejectMultiple, zodAlwaysRejectMultipleMessage1, zodAlwaysRejectMultipleMessage2 } from "../utils";
 
 describe("interpretZodError", () => {
     it("correctly interprets an error at the root level", () => {

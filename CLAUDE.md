@@ -8,7 +8,7 @@ The folder `./docs` should contain documentation for every public component (Tab
 
 If you find yourself needing to write a new docs file, read `./DOCS_GUIDE.md` for detailed instructions on file placement, structure, and formatting conventions.
 
-While `./src/types.ts` contains most types, there are some types that are exported directly from their respective files.
+Library-neutral code lives in `./src/core` (with most types in `./src/core/types.ts`), and Zod-specific code lives in `./src/zod` (with Zod type aliases in `./src/zod/types.ts`). Each supported schema library gets a `SchemaAdapter` (see `./src/core/adapter.ts`), and its exports are created with `createSchemaUtils`. Shared implementation details live in `./src/internal`. Some types are exported directly from their respective files.
 
 The `test` directory contains tests for all public and internal components, aiming for 100% collective test coverage. They are organized similarly to `src`, but not exactly. Notably, individual test files may not cover all functionality, because the functionality is being provided by another component with its own tests in other files. So, don't get too ambitious and try to make tests that cover every possible case, since that will likely end up being redundant.
 

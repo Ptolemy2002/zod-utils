@@ -1,6 +1,6 @@
 import z, { ZodError } from "zod";
-import { zodFunctionSchema, zodValidatedFunction } from "src/function";
-import { expectError, zodAllLowercase, zodAllLowercaseMessage, zodAllUppercase, expectZodErrorStructure, zodAllUppercaseMessage, zodErrorStructureString } from "./utils";
+import { zodFunctionSchema, zodValidatedFunction } from "src/index";
+import { expectError, zodAllLowercase, zodAllLowercaseMessage, zodAllUppercase, expectZodErrorStructure, zodAllUppercaseMessage, zodErrorStructureString } from "../utils";
 
 const correctFunc = (s: string) => s.toUpperCase();
 const wrongFunc = (s: string) => s.toLowerCase();
