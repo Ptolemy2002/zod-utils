@@ -19,6 +19,9 @@ The utilities are built on a small adapter layer: each supported library provide
   - [clone](docs/zod/clone.md) - Utility for cloning Zod schemas without affecting the original
   - [typeGuards](docs/zod/typeGuards.md) - Type guards for Zod-related values
 
+## Pending Breaking Changes
+Breaking changes that would improve the library, but are not worth a major release by themselves, are tracked in [PENDING_BREAKING_CHANGES.md](./PENDING_BREAKING_CHANGES.md) along with the non-breaking workarounds currently in place for them. They will be made in the next major release.
+
 ## Dependencies
 - `@standard-schema/spec` (types only)
 

@@ -140,8 +140,9 @@ These types are defined in `src/zod/types.ts` and `src/zod/adapter.ts`. Most are
 
 ```typescript
 import { ZodAny, ZodOptional, ZodPipe, ZodSafeParseResult, ZodTransform, ZodType } from 'zod';
+import { $ZodType } from 'zod/v4/core';
 
-/** @deprecated The Zod utilities now accept any `ZodType`. */
+// Accepted by zodValidate and zodValidateWithErrors only (see PENDING_BREAKING_CHANGES.md).
 type ZodSafeParseable<O> = { safeParse: (data: unknown) => ZodSafeParseResult<O>; };
 
 type ZodValidator<O> = Validator<O>;
@@ -156,10 +157,10 @@ type ZodPath = SchemaPath;
 type InterpretableZodIssue = SchemaIssue;
 type InterpretableZodError = IssueContainer;
 
-type ZodArgsSchema = ZodType & ArgsSchema;
+type ZodArgsSchema = $ZodType & ArgsSchema;
 
-type ZodFunctionParseOptions<In extends ZodArgsSchema, Out extends ZodType> = ValidatedFunctionOptions<In, Out>;
-type ZodFunctionSchemaOptions<In extends ZodArgsSchema, Out extends ZodType> = FunctionSchemaOptions<In, Out, ZodType>;
+type ZodFunctionParseOptions<In extends ZodArgsSchema, Out extends $ZodType> = ValidatedFunctionOptions<In, Out>;
+type ZodFunctionSchemaOptions<In extends ZodArgsSchema, Out extends $ZodType> = FunctionSchemaOptions<In, Out, $ZodType>;
 
 interface ZodSchemaKind extends SchemaKind {
     readonly Schema: ZodPipe<ZodAny, ZodTransform<this["Output"], any>>;

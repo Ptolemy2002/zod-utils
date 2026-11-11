@@ -1,7 +1,9 @@
 import z, { ZodError } from "zod";
+import * as zm from "zod/mini";
 import {
     AsyncSchemaError, isZodError, zodAdapter, zodFunctionSchema, zodFunctionSchemaAsync, zodUtils,
-    zodValidate, zodValidateAsync, zodValidatedFunction, zodValidatedFunctionAsync, zodValidateWithErrorsAsync
+    zodValidate, zodValidateAsync, zodValidatedFunction, zodValidatedFunctionAsync, zodValidateWithErrors,
+    zodValidateWithErrorsAsync, ZodSafeParseable
 } from "src/index";
 import { expectZodErrorStructure, zodAllLowercase, zodAllLowercaseMessage, zodAllUppercase, zodAllUppercaseMessage } from "../utils";
 
@@ -25,6 +27,36 @@ describe("zodAdapter", () => {
             { message: "Bad", code: "custom", path: ["a", 0] },
             { message: "Other", code: "invalid_type", path: [] },
         ]);
+    });
+});
+
+describe("zod/mini schemas", () => {
+    it("are accepted by the adapter and the function utilities", () => {
+        const input = zm.tuple([zm.string()]);
+        expect(zodAdapter.isSchema(input)).toBe(true);
+
+        const func = zodValidatedFunction((s: string) => s.length, { input, output: zm.number() });
+        const result: number = func("abc");
+        expect(result).toBe(3);
+        expect(() => (func as (v: unknown) => number)(42)).toThrow(ZodError);
+    });
+});
+
+describe("objects with only a safeParse method", () => {
+    // Compatibility workaround; see PENDING_BREAKING_CHANGES.md.
+    // A plain object with no `~standard` property, so it can only be validated through `safeParse`.
+    const evenNumberSchema = z.number().refine(n => n % 2 === 0, { message: "Must be even" });
+    const evenNumber: ZodSafeParseable<number> = { safeParse: (data) => evenNumberSchema.safeParse(data) };
+
+    it("are accepted by zodValidate", () => {
+        expect(zodValidate(evenNumber)(2)).toBe(true);
+        expect(zodValidate(evenNumber)(3)).toBe(false);
+    });
+
+    it("are accepted by zodValidateWithErrors", () => {
+        expect(zodValidateWithErrors(evenNumber)(2)).toEqual({ success: true, value: 2 });
+        expectZodErrorStructure(zodValidateWithErrors(evenNumber)(3).error!, [{ message: "Must be even", path: ["(root)"] }]);
+        expect(() => zodValidateWithErrors(evenNumber, { _throw: true })(3)).toThrow(ZodError);
     });
 });
 

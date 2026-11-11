@@ -1,10 +1,13 @@
-import z, { ZodAny, ZodError, ZodPipe, ZodTransform, ZodType } from "zod";
-import { $ZodError, $ZodIssue } from "zod/v4/core";
+import z, { ZodAny, ZodError, ZodPipe, ZodTransform } from "zod";
+import { $ZodError, $ZodIssue, $ZodType } from "zod/v4/core";
 import { AsyncSchemaParser, createSchemaUtils, SchemaAdapter, SchemaKind } from "../core/adapter";
 import { interpretError, interpretIssue } from "../core/interpret";
 import { normalizeIssuePath, prefixIssuePath } from "../core/path";
-import { SchemaIssue } from "../core/types";
+import { isStandardSchema } from "../core/standard";
+import { SchemaIssue, StandardSchemaV1 } from "../core/types";
+import * as v from "../internal/validate";
 import { isZodError } from "./typeGuards";
+import { ZodSafeParseable, ZodValidateWithErrorsOptions, ZodValidator, ZodValidatorWithErrors } from "./types";
 
 /** The schema type created by the Zod adapter: a `z.any()` piped into a transform. */
 export interface ZodSchemaKind extends SchemaKind {
@@ -21,9 +24,10 @@ function addIssues(ctx: ZodTransformContext, issues: ReadonlyArray<SchemaIssue>)
     for (const issue of issues) ctx.addIssue(toZodIssue(issue) as Parameters<ZodTransformContext["addIssue"]>[0]);
 }
 
-export const zodAdapter: SchemaAdapter<ZodType, ZodError | $ZodError, ZodSchemaKind> = {
+// `$ZodType` (rather than the classic `ZodType`) so that `zod/mini` and core schemas are accepted too.
+export const zodAdapter: SchemaAdapter<$ZodType, ZodError | $ZodError, ZodSchemaKind> = {
     name: "Zod",
-    isSchema: (value): value is ZodType => value instanceof ZodType,
+    isSchema: (value): value is $ZodType => value instanceof $ZodType,
     isError: isZodError,
     createError: (issues) => new ZodError(issues.map(toZodIssue)),
 
@@ -53,15 +57,39 @@ export const zodAdapter: SchemaAdapter<ZodType, ZodError | $ZodError, ZodSchemaK
 export const zodUtils = createSchemaUtils(zodAdapter);
 
 export const {
-    validate: zodValidate,
     validateAsync: zodValidateAsync,
-    validateWithErrors: zodValidateWithErrors,
     validateWithErrorsAsync: zodValidateWithErrorsAsync,
     validatedFunction: zodValidatedFunction,
     validatedFunctionAsync: zodValidatedFunctionAsync,
     functionSchema: zodFunctionSchema,
     functionSchemaAsync: zodFunctionSchemaAsync,
 } = zodUtils;
+
+// Workaround (see PENDING_BREAKING_CHANGES.md): `zodValidate` and `zodValidateWithErrors` have always
+// accepted any object with a `safeParse` method, not only Zod schemas. Such objects are wrapped in a
+// Standard Schema so that these two functions stay compatible.
+function toStandardSchema<O>(p: ZodSafeParseable<O>): StandardSchemaV1<unknown, O> {
+    if (isStandardSchema(p)) return p as StandardSchemaV1<unknown, O>;
+
+    return {
+        "~standard": {
+            version: 1,
+            vendor: "zod",
+            validate: (value) => {
+                const result = p.safeParse(value);
+                return result.success ? { value: result.data } : { issues: result.error.issues };
+            },
+        },
+    };
+}
+
+export function zodValidate<O>(p: ZodSafeParseable<O>): ZodValidator<O> {
+    return v.validate(toStandardSchema(p));
+}
+
+export function zodValidateWithErrors<O>(p: ZodSafeParseable<O>, options?: ZodValidateWithErrorsOptions): ZodValidatorWithErrors<O> {
+    return v.validateWithErrors(zodAdapter, toStandardSchema(p), options);
+}
 
 // These do not depend on the adapter. The Zod names are kept for compatibility.
 export const interpretZodError = interpretError;
