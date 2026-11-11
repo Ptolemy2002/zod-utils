@@ -107,6 +107,21 @@ describe("zodValidateWithErrorsAsync", () => {
 describe("zodValidatedFunctionAsync", () => {
     const options = { input: z.tuple([asyncLowercase]), output: asyncUppercase };
 
+    it("passes coerced/transformed arguments to the function and returns the coerced/transformed output", async () => {
+        const received: unknown[] = [];
+        const func = zodValidatedFunctionAsync(async (...args: unknown[]) => {
+            received.push(...args);
+            return "5";
+        }, {
+            input: z.tuple([z.coerce.number(), z.string().transform(s => s.length)]),
+            output: z.coerce.number()
+        });
+
+        const result: number = await func("3", "abc");
+        expect(result).toBe(5);
+        expect(received).toEqual([3, 3]);
+    });
+
     it("validates with async schemas and awaits async functions", async () => {
         const func = zodValidatedFunctionAsync(async (s: string) => s.toUpperCase(), options);
         await expect(func("hello")).resolves.toBe("HELLO");
@@ -120,6 +135,23 @@ describe("zodValidatedFunctionAsync", () => {
 });
 
 describe("zodFunctionSchemaAsync", () => {
+    it("accepts pre-transform trial inputs and validates against transformed outputs", async () => {
+        const received: unknown[] = [];
+        const transformingSchema = zodFunctionSchemaAsync({
+            input: z.tuple([z.coerce.number()]),
+            output: z.number().transform(n => n * 2),
+            trials: [{ input: ["2"], outputSchema: z.literal(6) }]
+        });
+
+        const func = await transformingSchema.parseAsync(async (n: number) => {
+            received.push(n);
+            return n + 1;
+        });
+
+        await expect(func("4")).resolves.toBe(10);
+        expect(received).toEqual([2, 4]);
+    });
+
     const schema = zodFunctionSchemaAsync({
         input: z.tuple([zodAllLowercase]),
         output: zodAllUppercase,
