@@ -48,7 +48,6 @@ These are the Zod versions of the [function utilities](../core/function.md), cre
 - `input`, `output` and trial `outputSchema` must be Zod schemas (classic, `zod/mini` or core). `input` should be a tuple or array schema.
 - Validation failures, and non-callable values passed to `zodValidatedFunction`, throw a `ZodError`.
 - `zodFunctionSchema` and `zodFunctionSchemaAsync` return Zod schemas (`z.any().transform(...)`), so they can be nested in other Zod schemas. Non-callable values fail with an `invalid_type` issue.
-- In `errorStringify`'s default, `ZodError`s (as detected by [`isZodError`](./typeGuards.md)) are formatted with `interpretZodError(e, { multiline: false })`.
 
 # zodValidatedFunction
 ```typescript

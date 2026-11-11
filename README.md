@@ -19,6 +19,20 @@ The utilities are built on a small adapter layer: each supported library provide
   - [clone](docs/zod/clone.md) - Utility for cloning Zod schemas without affecting the original
   - [typeGuards](docs/zod/typeGuards.md) - Type guards for Zod-related values
 
+## Import Paths
+The package has three entry points:
+
+- `@ptolemy2002/zod-utils/core`: The library-neutral utilities. Does not require Zod.
+- `@ptolemy2002/zod-utils/zod`: The Zod-specific utilities. Requires Zod.
+- `@ptolemy2002/zod-utils`: Everything from both of the above. Requires Zod.
+
+```typescript
+import { validate, functionSchema } from "@ptolemy2002/zod-utils/core";
+import { zodValidate, zodFunctionSchema } from "@ptolemy2002/zod-utils/zod";
+```
+
+Zod is an optional peer dependency, so it only needs to be installed when using `/zod` or the root path. Files inside the package (such as `@ptolemy2002/zod-utils/dist/...`) cannot be imported directly.
+
 ## Pending Breaking Changes
 Breaking changes that would improve the library, but are not worth a major release by themselves, are tracked in [PENDING_BREAKING_CHANGES.md](./PENDING_BREAKING_CHANGES.md) along with the non-breaking workarounds currently in place for them. They will be made in the next major release.
 
@@ -26,7 +40,7 @@ Breaking changes that would improve the library, but are not worth a major relea
 - `@standard-schema/spec` (types only)
 
 ## Peer Dependencies
-- `zod^4.3.6`
+- `zod^4.3.6` (optional; only required for the root and `/zod` import paths)
 
 ## Commands
 The following commands exist in the project:
@@ -42,6 +56,7 @@ The following commands exist in the project:
 - `npm run test:coverage` - Runs the tests for the library and generates a coverage report
 - `npm run test:watch` - Runs the tests for the library in watch mode
 - `npm run typecheck` - Identifies any type errors in the library
+- `npm run test:package` - Builds and packs the library, then checks each import path at runtime and with TypeScript in temporary projects with and without Zod installed
 
 ## Testing Guide
 

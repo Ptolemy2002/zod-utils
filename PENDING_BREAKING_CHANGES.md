@@ -15,6 +15,16 @@ Each entry has a `##` heading naming the change, followed by these sections:
 
 ---
 
+## Make the root import path library-neutral
+
+**Problem**: The root import path (`@ptolemy2002/zod-utils`) exports the Zod utilities as well as the library-neutral ones, so it requires Zod to be installed even when only the library-neutral utilities are used. As more schema libraries get adapters, the root would have to require every one of them.
+
+**Breaking change**: Make the root export only what `/core` exports. Zod utilities are then only available from `@ptolemy2002/zod-utils/zod`, and code that imports them from the root breaks.
+
+**Current workaround**: `src/index.ts` exports both `./core` and `./zod`. Zod is an optional peer dependency (`peerDependenciesMeta` in `package.json`), and the `/core` import path is available for code that does not use Zod.
+
+**Reverting the workaround**: Change `src/index.ts` to export only `./core` (or make the root's `exports` entry in `package.json` point at `dist/core`). Update the "consumer without Zod" checks in `scripts/test-package.sh` so that the root path is expected to load, and the "Import Paths" section of `README.md`. Update the docs and examples that import Zod utilities from the root.
+
 ## Require Zod schemas in `zodValidate` and `zodValidateWithErrors`
 
 **Problem**: Every Zod utility is created from `zodAdapter` with `createSchemaUtils`, and validates through the Standard Schema interface. `zodValidate` and `zodValidateWithErrors` are the exception: they have always accepted any object with a `safeParse` method (`ZodSafeParseable`), which has no Standard Schema interface. So they cannot simply be `zodUtils.validate` and `zodUtils.validateWithErrors`, and they behave differently from their async counterparts, which require a Zod schema.

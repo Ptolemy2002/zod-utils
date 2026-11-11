@@ -65,7 +65,7 @@ The contract each supported schema library implements.
 ## Properties
 - `name` (`string`): A human-readable name for the library.
 - `isSchema(value: unknown) => value is Schema`: Type guard for the library's schemas.
-- `isError(err: unknown) => err is Err`: Type guard for the library's validation errors. Used to tell input/output validation errors apart from other errors during function trials, and to format errors in trial messages.
+- `isError(err: unknown) => err is Err`: Type guard for the library's validation errors. It is exposed as `isError` on the utilities object, but the utilities themselves do not depend on it.
 - `createError(issues: ReadonlyArray<SchemaIssue>) => Err`: Creates the library's validation error. The issues may lack a `code` and may contain `{ key }` path segments, so the adapter should normalize them as needed.
 - `createSchema<O>(parse: SchemaParser<O>) => ApplySchemaKind<Kind, O>`: Wraps `parse` in a schema of the library's type. When `parse` returns `{ issues }`, the schema must fail with those issues. Otherwise it must succeed with `value`.
 - `createAsyncSchema<O>(parse: AsyncSchemaParser<O>) => ApplySchemaKind<Kind, O>`: The same as `createSchema`, but `parse` is asynchronous.
@@ -86,7 +86,7 @@ Implement a `SchemaAdapter` and pass it to `createSchemaUtils`. The following is
 
 ```typescript
 import * as v from "valibot";
-import { createSchemaUtils, normalizeIssuePath, SchemaAdapter, SchemaKind } from "@ptolemy2002/zod-utils";
+import { createSchemaUtils, normalizeIssuePath, SchemaAdapter, SchemaKind } from "@ptolemy2002/zod-utils/core";
 
 interface ValibotSchemaKind extends SchemaKind {
     readonly Schema: v.GenericSchema<unknown, this["Output"]>;

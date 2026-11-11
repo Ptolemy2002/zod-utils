@@ -121,8 +121,8 @@ If `trials` are provided, the function is called once per trial at parse time to
       - A function `(e: unknown) => boolean`: If the function returns `false` for the thrown error, adds an `"Unexpected Error: ..."` issue.
       - `{ require: (e: unknown) => boolean }`: If the function returns `false` for the thrown error, adds an `"Unexpected Error: ..."` issue. Additionally, if no error is thrown, adds an `"Unexpected Success"` issue.
 
-      Input and output validation errors are always reported as issues (under the trial `id`) rather than being treated as thrown errors.
-    - `errorStringify` (`(e: unknown) => string`, optional): Custom serializer for unexpected errors used in issue messages. Defaults to `interpretError(e, { multiline: false })` for the adapter's errors (producing a message where each issue and its path is on a single line), `e.message` for other `Error` instances, and `String(e)` for all other values.
+      Errors thrown by the wrapper's own input and output validation are always reported as issues (under the trial `id`) rather than being treated as thrown errors. Any other error, including a validation error thrown from inside the function (for example by another validated function it calls), is treated as a thrown error.
+    - `errorStringify` (`(e: unknown) => string`, optional): Custom serializer for unexpected errors used in issue messages. Defaults to `interpretError(e, { multiline: false })` for any value with an `issues` array (as detected by [`hasIssues`](./error.md#hasissues)), which covers errors from any schema library or version and produces a message where each issue and its path is on a single line. Otherwise, defaults to `e.message` for `Error` instances and `String(e)` for all other values.
 
 **Returned schema (parsed function)**
 - `...args` (`InferArgsInput<In>`): Arguments forwarded to the original function after input validation.
