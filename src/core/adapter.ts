@@ -1,10 +1,10 @@
-import * as fn from "../internal/function";
-import * as v from "../internal/validate";
+import * as fn from "src/internal/function";
+import * as v from "src/internal/validate";
 import {
     ArgsSchema, AsyncValidatedFunction, AsyncValidator, AsyncValidatorWithErrors, FunctionSchemaOptions,
     IssueError, SchemaIssue, StandardSchemaV1, ValidatedFunction, ValidatedFunctionOptions,
     ValidateWithErrorsOptions, ValidationOutcome, Validator, ValidatorWithErrors
-} from "./types";
+} from "src/core/types";
 
 /**
  * Describes the schema type a library produces for a given output type. TypeScript has no

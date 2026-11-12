@@ -1,7 +1,7 @@
-import type { SchemaAdapter } from "../core/adapter";
-import { interpretError } from "../core/interpret";
-import * as t from "../core/types";
-import { standardValidate, standardValidateAsync } from "./standardValidate";
+import type { SchemaAdapter } from "src/core/adapter";
+import { interpretError } from "src/core/interpret";
+import * as t from "src/core/types";
+import { standardValidate, standardValidateAsync } from "src/internal/standardValidate";
 
 type Out<S extends t.StandardSchemaV1> = t.StandardSchemaV1.InferOutput<S>;
 

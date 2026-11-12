@@ -1,13 +1,13 @@
 import z, { ZodAny, ZodError, ZodPipe, ZodTransform } from "zod";
 import { $ZodError, $ZodIssue, $ZodType } from "zod/v4/core";
-import { AsyncSchemaParser, createSchemaUtils, SchemaAdapter, SchemaKind } from "../core/adapter";
-import { interpretError, interpretIssue } from "../core/interpret";
-import { normalizeIssuePath, prefixIssuePath } from "../core/path";
-import { isStandardSchema } from "../core/standard";
-import { SchemaIssue, StandardSchemaV1 } from "../core/types";
-import * as v from "../internal/validate";
-import { isZodError } from "./typeGuards";
-import { ZodSafeParseable, ZodValidateWithErrorsOptions, ZodValidator, ZodValidatorWithErrors } from "./types";
+import { AsyncSchemaParser, createSchemaUtils, SchemaAdapter, SchemaKind } from "src/core/adapter";
+import { interpretError, interpretIssue } from "src/core/interpret";
+import { normalizeIssuePath, prefixIssuePath } from "src/core/path";
+import { isStandardSchema } from "src/core/standard";
+import { SchemaIssue, StandardSchemaV1 } from "src/core/types";
+import * as v from "src/internal/validate";
+import { isZodError } from "src/zod/typeGuards";
+import { ZodSafeParseable, ZodValidateWithErrorsOptions, ZodValidator, ZodValidatorWithErrors } from "src/zod/types";
 
 /** The schema type created by the Zod adapter: a `z.any()` piped into a transform. */
 export interface ZodSchemaKind extends SchemaKind {

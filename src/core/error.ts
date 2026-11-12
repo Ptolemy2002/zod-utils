@@ -1,5 +1,5 @@
-import { interpretError } from "./interpret";
-import { IssueContainer, SchemaIssue } from "./types";
+import { interpretError } from "src/core/interpret";
+import { IssueContainer, SchemaIssue } from "src/core/types";
 
 /**
  * The error thrown by the library-neutral utilities (and by any adapter that

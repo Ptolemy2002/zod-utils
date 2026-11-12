@@ -1,4 +1,4 @@
-import { PathSegment, SchemaIssue, SchemaPath } from "./types";
+import { PathSegment, SchemaIssue, SchemaPath } from "src/core/types";
 
 /**
  * Converts a Standard Schema issue path (which may contain `{ key }` segments)

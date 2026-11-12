@@ -1,6 +1,6 @@
-import { createSchemaUtils, SchemaAdapter, SchemaKind } from "./adapter";
-import { isSchemaValidationError, SchemaValidationError } from "./error";
-import { StandardSchemaV1, ValidationOutcome } from "./types";
+import { createSchemaUtils, SchemaAdapter, SchemaKind } from "src/core/adapter";
+import { isSchemaValidationError, SchemaValidationError } from "src/core/error";
+import { StandardSchemaV1, ValidationOutcome } from "src/core/types";
 
 /** The schema type created by the library-neutral adapter: a plain Standard Schema object. */
 export interface StandardSchemaKind extends SchemaKind {

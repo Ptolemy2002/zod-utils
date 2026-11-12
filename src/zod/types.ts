@@ -1,6 +1,6 @@
 import { ZodOptional, ZodSafeParseResult, ZodType } from 'zod';
 import { $ZodType } from 'zod/v4/core';
-import * as t from '../core/types';
+import * as t from 'src/core/types';
 
 // Most Zod types are now aliases of the library-neutral types in `core`.
 // They are kept so that existing code continues to compile.

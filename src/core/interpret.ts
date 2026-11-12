@@ -1,5 +1,5 @@
-import { prefixIssuePath } from "./path";
-import { IssueContainer, SchemaIssue, SchemaPath, InterpretErrorOptions } from "./types";
+import { prefixIssuePath } from "src/core/path";
+import { IssueContainer, SchemaIssue, SchemaPath, InterpretErrorOptions } from "src/core/types";
 
 // Mirrors Zod's `toDotPath` so that output is identical to `z.prettifyError`
 // without requiring Zod.

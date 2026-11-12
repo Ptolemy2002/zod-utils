@@ -1,5 +1,5 @@
-import { AsyncSchemaError } from "../core/error";
-import { StandardSchemaV1, ValidationOutcome } from "../core/types";
+import { AsyncSchemaError } from "src/core/error";
+import { StandardSchemaV1, ValidationOutcome } from "src/core/types";
 
 function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
     return typeof value === "object" && value !== null && typeof (value as { then?: unknown }).then === "function";

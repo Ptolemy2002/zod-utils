@@ -1,2 +1,2 @@
-export * from './core';
-export * from './zod';
+export * from 'src/core';
+export * from 'src/zod';

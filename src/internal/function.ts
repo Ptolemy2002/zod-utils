@@ -1,13 +1,13 @@
 import isCallable from "is-callable";
-import type { SchemaAdapter } from "../core/adapter";
-import { hasIssues } from "../core/error";
-import { interpretError } from "../core/interpret";
-import { normalizeIssuePath, prefixIssuePath } from "../core/path";
+import type { SchemaAdapter } from "src/core/adapter";
+import { hasIssues } from "src/core/error";
+import { interpretError } from "src/core/interpret";
+import { normalizeIssuePath, prefixIssuePath } from "src/core/path";
 import {
     ArgsSchema, FunctionSchemaOptions, FunctionTrial, SchemaIssue, SchemaPath,
     StandardSchemaV1, ValidatedFunctionOptions, ValidationOutcome
-} from "../core/types";
-import { standardValidate, standardValidateAsync } from "./standardValidate";
+} from "src/core/types";
+import { standardValidate, standardValidateAsync } from "src/internal/standardValidate";
 
 type AnyAdapter = SchemaAdapter<any, any, any>;
 type AnyFunction = (...args: unknown[]) => unknown;
