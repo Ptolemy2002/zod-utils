@@ -1,5 +1,5 @@
 import { ZodError } from "zod";
-import { expectZodValidation, expectZodValidationWithErrors, zodAlwaysAccept, zodAlwaysReject, zodAlwaysRejectNested, zodAlwaysRejectMessage, expectError, expectZodErrorStructure } from "./utils";
+import { expectZodValidation, expectZodValidationWithErrors, zodAlwaysAccept, zodAlwaysReject, zodAlwaysRejectNested, zodAlwaysRejectMessage, expectError, expectZodErrorStructure } from "../utils";
 import { zodValidateWithErrors } from "src/index";
 
 describe("zodValidate", () => {

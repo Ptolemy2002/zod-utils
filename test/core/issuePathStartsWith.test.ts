@@ -1,4 +1,4 @@
-import { issuePathStartsWith } from "src/issuePathStartsWith";
+import { issuePathStartsWith } from "src/index";
 
 describe("issuePathStartsWith", () => {
     it("returns true when a single-segment string prefix matches", () => {
@@ -36,5 +36,15 @@ describe("issuePathStartsWith", () => {
     it("correctly compares numeric path segments", () => {
         expect(issuePathStartsWith([0, "field"], [0])).toBe(true);
         expect(issuePathStartsWith([1, "field"], [0])).toBe(false);
+    });
+
+    it("treats Standard Schema `{ key }` path segments as their keys", () => {
+        expect(issuePathStartsWith([{ key: "args" }, { key: 0 }], ["args", 0])).toBe(true);
+        expect(issuePathStartsWith([{ key: "return" }], "args")).toBe(false);
+    });
+
+    it("treats an undefined path as empty", () => {
+        expect(issuePathStartsWith(undefined, [])).toBe(true);
+        expect(issuePathStartsWith(undefined, "args")).toBe(false);
     });
 });

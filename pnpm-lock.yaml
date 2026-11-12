@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@standard-schema/spec':
+        specifier: ^1.1.0
+        version: 1.1.0
       is-callable:
         specifier: ^1.2.7
         version: 1.2.7
@@ -33,9 +36,15 @@ importers:
       tsconfig-paths:
         specifier: ^4.2.0
         version: 4.2.0
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
       typescript-transform-paths:
         specifier: ^3.5.3
         version: 3.5.6(typescript@5.9.3)
+      valibot:
+        specifier: ^1.5.0
+        version: 1.5.0(typescript@5.9.3)
       zod:
         specifier: ^4.3.6
         version: 4.3.6
@@ -305,6 +314,9 @@ packages:
 
   '@sinonjs/fake-timers@10.3.0':
     resolution: {integrity: sha512-V4BG07kuYSUkTCSBHG8G8TNhM+F19jXFWnQtzj+we8DrkpSBCee9Z3Ms8yiGer/dlmhe35/Xdgyo3/0rQKg7YA==}
+
+  '@standard-schema/spec@1.1.0':
+    resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}
 
   '@types/babel__core@7.20.5':
     resolution: {integrity: sha512-qoQprZvz5wQFJwMDqeseRXWv3rqMvhgpbXFfVyWhbx9X47POIA6i/+dXefEmZKoAgOaTdaIgNSMqMIU61yRyzA==}
@@ -1196,6 +1208,14 @@ packages:
     resolution: {integrity: sha512-kiGUalWN+rgBJ/1OHZsBtU4rXZOfj/7rKQxULKlIzwzQSvMJUUNgPwJEEh7gU6xEVxC0ahoOBvN2YI8GH6FNgA==}
     engines: {node: '>=10.12.0'}
 
+  valibot@1.5.0:
+    resolution: {integrity: sha512-nil6AkP2TChWL43Z5uJ6GTxX01CUA+g8LWUM+N/rB9NBbkUMaUsi9PUNzlUPgoKASgmx9f7eGOYpJ04/fSa6FQ==}
+    peerDependencies:
+      typescript: '>=5'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
   walker@1.0.8:
     resolution: {integrity: sha512-ts/8E8l5b7kY0vlWLewOkDXMmPdLcVV4GmOQLyxuSswIJsweeFZtAsMF7k1Nszz+TYBQrlYRmzOnr398y1JemQ==}
 
@@ -1636,6 +1656,8 @@ snapshots:
   '@sinonjs/fake-timers@10.3.0':
     dependencies:
       '@sinonjs/commons': 3.0.1
+
+  '@standard-schema/spec@1.1.0': {}
 
   '@types/babel__core@7.20.5':
     dependencies:
@@ -2655,6 +2677,10 @@ snapshots:
       '@jridgewell/trace-mapping': 0.3.31
       '@types/istanbul-lib-coverage': 2.0.6
       convert-source-map: 2.0.0
+
+  valibot@1.5.0(typescript@5.9.3):
+    optionalDependencies:
+      typescript: 5.9.3
 
   walker@1.0.8:
     dependencies:

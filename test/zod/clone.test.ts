@@ -1,5 +1,5 @@
-import { zodClone } from "src/clone";
-import { expectZodValidation, zodAlwaysAccept, zodAlwaysReject } from "./utils";
+import { zodClone } from "src/index";
+import { expectZodValidation, zodAlwaysAccept, zodAlwaysReject } from "../utils";
 
 describe("zodClone", () => {
     it("creates a new instance", () => {

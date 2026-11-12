@@ -1,6 +1,6 @@
 import z, { ZodError } from "zod";
-import { zodFunctionSchema, zodValidatedFunction } from "src/function";
-import { expectError, zodAllLowercase, zodAllLowercaseMessage, zodAllUppercase, expectZodErrorStructure, zodAllUppercaseMessage, zodErrorStructureString } from "./utils";
+import { zodFunctionSchema, zodValidatedFunction } from "src/index";
+import { expectError, zodAllLowercase, zodAllLowercaseMessage, zodAllUppercase, expectZodErrorStructure, zodAllUppercaseMessage, zodErrorStructureString } from "../utils";
 
 const correctFunc = (s: string) => s.toUpperCase();
 const wrongFunc = (s: string) => s.toLowerCase();
@@ -404,6 +404,67 @@ describe("zodFunctionSchema", () => {
                                 path: ["test"],
                                 multiline: false
                             }])
+                        }`,
+                        path: ["myTrial"]
+                    }
+                ]);
+            });
+        });
+
+        it("treats a ZodError thrown by the function as an unexpected error, even if its path looks like an input path", () => {
+            const throwsArgsError = () => {
+                throw new ZodError([{ code: "custom", message: "Thrown by the function", path: ["args", 0] }]);
+            };
+
+            const schema = zodFunctionSchema({ trials: [{ id: "myTrial", input: [] }] });
+
+            expectError(() => {
+                schema.parse(throwsArgsError);
+            }, ZodError, (e) => {
+                expectZodErrorStructure(e, [
+                    {
+                        message: `Unexpected Error: ${
+                            zodErrorStructureString([{ message: "Thrown by the function", path: ["args", 0], multiline: false }])
+                        }`,
+                        path: ["myTrial"]
+                    }
+                ]);
+            });
+        });
+
+        it("treats validation errors from another validated function called inside the function as unexpected errors", () => {
+            const inner = zodValidatedFunction((s: string) => s, { input: z.tuple([zodAllLowercase]) });
+            const outer = (s: string) => inner(s.toUpperCase());
+
+            const schema = zodFunctionSchema({
+                input: z.tuple([zodAllLowercase]),
+                trials: [{ id: "myTrial", input: ["hello"] }]
+            });
+
+            expectError(() => {
+                schema.parse(outer);
+            }, ZodError, (e) => {
+                expect(e.issues).toHaveLength(1);
+                expect(e.issues[0]!.path).toEqual(["myTrial"]);
+                expect(e.issues[0]!.message).toMatch(/^Unexpected Error: /);
+            });
+        });
+
+        it("formats errors with issues from other libraries or Zod versions by default", () => {
+            // The shape of a Zod 3 error: not an instance of Zod 4's ZodError, but it has issues.
+            const throwsZod3Error = () => {
+                throw Object.assign(new Error("zod 3"), { name: "ZodError", issues: [{ code: "custom", message: "Old Zod", path: ["field"] }] });
+            };
+
+            const schema = zodFunctionSchema({ trials: [{ id: "myTrial", input: [] }] });
+
+            expectError(() => {
+                schema.parse(throwsZod3Error);
+            }, ZodError, (e) => {
+                expectZodErrorStructure(e, [
+                    {
+                        message: `Unexpected Error: ${
+                            zodErrorStructureString([{ message: "Old Zod", path: ["field"], multiline: false }])
                         }`,
                         path: ["myTrial"]
                     }

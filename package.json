@@ -4,6 +4,31 @@
     "private": false,
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "default": "./dist/index.js"
+        },
+        "./core": {
+            "types": "./dist/core/index.d.ts",
+            "default": "./dist/core/index.js"
+        },
+        "./zod": {
+            "types": "./dist/zod/index.d.ts",
+            "default": "./dist/zod/index.js"
+        },
+        "./package.json": "./package.json"
+    },
+    "typesVersions": {
+        "*": {
+            "core": [
+                "dist/core/index.d.ts"
+            ],
+            "zod": [
+                "dist/zod/index.d.ts"
+            ]
+        }
+    },
     "files": [
         "/dist"
     ],
@@ -25,10 +50,16 @@
         "release": "bash ./scripts/release.sh",
         "release-patch": "bash ./scripts/release.sh patch",
         "release-minor": "bash ./scripts/release.sh minor",
-        "release-major": "bash ./scripts/release.sh major"
+        "release-major": "bash ./scripts/release.sh major",
+        "test:package": "bash ./scripts/test-package.sh"
     },
     "peerDependencies": {
         "zod": "^4.3.6"
+    },
+    "peerDependenciesMeta": {
+        "zod": {
+            "optional": true
+        }
     },
     "devDependencies": {
         "@types/is-callable": "^1.1.2",
@@ -38,10 +69,13 @@
         "ts-jest": "^29.1.0",
         "ts-patch": "^3.3.0",
         "tsconfig-paths": "^4.2.0",
+        "typescript": "^5.9.3",
         "typescript-transform-paths": "^3.5.3",
+        "valibot": "^1.5.0",
         "zod": "^4.3.6"
     },
     "dependencies": {
+        "@standard-schema/spec": "^1.1.0",
         "is-callable": "^1.2.7"
     }
 }
