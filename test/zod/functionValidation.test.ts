@@ -1,6 +1,6 @@
 import z, { ZodError } from "zod";
 import {
-    createSchemaUtils, SchemaValidationError, standardAdapter, StandardSchemaV1, validatedFunction,
+    SchemaValidationError, StandardSchemaV1, validatedFunction,
     getFunctionValidation, resetFunctionValidation, setFunctionValidation,
     zodFunctionSchema, zodFunctionSchemaAsync, zodValidatedFunction, zodValidatedFunctionAsync
 } from "src/index";
@@ -74,16 +74,9 @@ describe("validated functions with the global flags", () => {
         expect(validatedFunction((n: unknown) => n, { input: opaque })("5")).toBe(5);
     });
 
-    it("never skips schemas for adapters without mayTransform", () => {
-        const { mayTransform: _, ...adapter } = standardAdapter;
-        const utils = createSchemaUtils(adapter);
+    it("never skips schemas in the library-neutral functions, even Zod schemas", () => {
         setFunctionValidation({ input: false });
-        expect(() => utils.validatedFunction((s: string) => s, { input: z.tuple([zodAllLowercase]) })("HELLO")).toThrow(SchemaValidationError);
-    });
-
-    it("detects Zod schemas passed to the library-neutral functions", () => {
-        setFunctionValidation({ input: false });
-        expect(validatedFunction((s: string) => s, { input: z.tuple([zodAllLowercase]) })("HELLO")).toBe("HELLO");
+        expect(() => validatedFunction((s: string) => s, { input: z.tuple([zodAllLowercase]) })("HELLO")).toThrow(SchemaValidationError);
     });
 
     it("still validates the output when only input validation is disabled", () => {

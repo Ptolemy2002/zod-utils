@@ -14,7 +14,7 @@ The flags are shared by every adapter and import path (root, `/core` and `/zod`)
 
 When a flag is `false`, the corresponding schema is skipped only if it is known to never change the value, as determined by the adapter's [`mayTransform`](./adapter.md#properties). Schemas that may transform the value (transforms, coercions, defaults, `.trim()`, ...) still run, so the function receives the same arguments and the caller receives the same return value either way. Since running a schema also validates, such schemas still throw on invalid values. Transforms cannot be applied without validation. The check is done once per wrapper and schema, the first time it is needed.
 
-Only Zod schemas can be inspected, by both the Zod and the library-neutral adapter. Schemas from other libraries are assumed to possibly transform, so they always run, and the flags have no effect on them.
+Whether a schema can be inspected depends on the adapter. [`zodAdapter`](../zod/adapter.md#zodadapter) inspects Zod schemas, so the flags take effect for the [Zod versions](../zod/function.md) of the function utilities. [`standardAdapter`](./adapter.md#standardadapter) cannot inspect any schema, so the library-neutral versions always run their schemas (even Zod schemas), and the flags have no effect on them.
 
 Disabling output validation is useful when the project is confirmed to be type-safe and the cost of validating every return value is not worth it. Disabling input validation should only be done when every caller can be trusted to pass valid arguments.
 

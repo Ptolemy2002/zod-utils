@@ -5,8 +5,8 @@ import { interpretError, interpretIssue } from "src/core/interpret";
 import { normalizeIssuePath, prefixIssuePath } from "src/core/path";
 import { isStandardSchema } from "src/core/standard";
 import { SchemaIssue, StandardSchemaV1 } from "src/core/types";
-import { mayTransform } from "src/internal/mayTransform";
 import * as v from "src/internal/validate";
+import { zodMayTransform } from "src/zod/mayTransform";
 import { isZodError } from "src/zod/typeGuards";
 import { ZodSafeParseable, ZodValidateWithErrorsOptions, ZodValidator, ZodValidatorWithErrors } from "src/zod/types";
 
@@ -54,7 +54,7 @@ export const zodAdapter: SchemaAdapter<$ZodType, ZodError | $ZodError, ZodSchema
             return result.value;
         }) as unknown as ZodPipe<ZodAny, ZodTransform<O, any>>,
 
-    mayTransform,
+    mayTransform: zodMayTransform,
 };
 
 export const zodUtils = createSchemaUtils(zodAdapter);

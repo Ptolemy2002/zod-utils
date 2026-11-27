@@ -1,6 +1,6 @@
 import z from "zod";
 import * as zm from "zod/mini";
-import { standardAdapter, StandardSchemaV1, zodAdapter, zodFunctionSchema } from "src/index";
+import { StandardSchemaV1, zodAdapter, zodFunctionSchema } from "src/index";
 
 const mayTransform = (schema: StandardSchemaV1) => zodAdapter.mayTransform!(schema);
 
@@ -54,19 +54,14 @@ describe("mayTransform (Zod detection)", () => {
         expect(mayTransform(trimmedTree)).toBe(true);
     });
 
-    it("returns true for schemas from other libraries and for unrecognized Zod structures", () => {
-        const other: StandardSchemaV1 = { "~standard": { version: 1, vendor: "other", validate: (value) => ({ value }) } };
-        expect(mayTransform(other)).toBe(true);
-
-        const noDef: StandardSchemaV1 = { "~standard": { version: 1, vendor: "zod", validate: (value) => ({ value }) } };
-        expect(mayTransform(noDef)).toBe(true);
-
-        const unknownType = { "~standard": noDef["~standard"], _zod: { def: { type: "something_new" } } };
-        expect(mayTransform(unknownType)).toBe(true);
+    it("returns true for schemas from other libraries", () => {
+        const zodVendor: StandardSchemaV1 = { "~standard": { version: 1, vendor: "zod", validate: (value) => ({ value }) } };
+        expect(mayTransform(zodVendor)).toBe(true);
     });
 
-    it("is shared by the standard adapter", () => {
-        expect(standardAdapter.mayTransform!(z.string())).toBe(false);
-        expect(standardAdapter.mayTransform!(z.string().trim())).toBe(true);
+    it("returns true for unrecognized Zod schema types", () => {
+        // Passes the `$ZodType` instance check, but has a type this version does not know about.
+        const unknownType = { "~standard": z.string()["~standard"], _zod: { traits: new Set(["$ZodType"]), def: { type: "something_new" } } };
+        expect(mayTransform(unknownType as unknown as StandardSchemaV1)).toBe(true);
     });
 });
