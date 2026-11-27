@@ -1,3 +1,4 @@
+import { mayTransform } from "src/internal/mayTransform";
 import { createSchemaUtils, SchemaAdapter, SchemaKind } from "src/core/adapter";
 import { isSchemaValidationError, SchemaValidationError } from "src/core/error";
 import { StandardSchemaV1, ValidationOutcome } from "src/core/types";
@@ -38,6 +39,7 @@ export const standardAdapter: SchemaAdapter<StandardSchemaV1, SchemaValidationEr
     createError: (issues) => new SchemaValidationError(issues),
     createSchema: (parse) => createStandardSchema(parse),
     createAsyncSchema: (parse) => createStandardSchema(parse),
+    mayTransform,
 };
 
 export const standardUtils = createSchemaUtils(standardAdapter);

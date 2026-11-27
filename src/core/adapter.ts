@@ -54,6 +54,12 @@ export type SchemaAdapter<
     createSchema<O>(parse: SchemaParser<O>): ApplySchemaKind<Kind, O>;
     /** Creates a schema of the library's type that runs `parse` asynchronously. */
     createAsyncSchema<O>(parse: AsyncSchemaParser<O>): ApplySchemaKind<Kind, O>;
+    /**
+     * Returns `false` only if `schema` is known to never change the value it validates. Used to decide
+     * whether a schema can be skipped when validation is disabled with `setFunctionValidation`.
+     * If omitted, every schema is assumed to possibly transform, so schemas are never skipped.
+     */
+    mayTransform?(schema: StandardSchemaV1): boolean;
 };
 
 /**

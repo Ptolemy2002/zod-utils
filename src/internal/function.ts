@@ -65,19 +65,38 @@ type ValidationFlagsGetter = () => Readonly<FunctionValidationFlags>;
 const ALWAYS_VALIDATE: FunctionValidationFlags = Object.freeze({ input: true, output: true });
 const alwaysValidate: ValidationFlagsGetter = () => ALWAYS_VALIDATE;
 
+/**
+ * Returns whether a schema should run on a call, given whether validation of its side is enabled.
+ * When validation is disabled, a schema still runs if it may transform the value, since skipping it
+ * would change what the function receives or returns. That check is done once, on first need.
+ */
+function validationGate(adapter: AnyAdapter, schema: StandardSchemaV1 | undefined) {
+    let transforms: boolean | undefined;
+
+    return (enabled: boolean): boolean => {
+        if (!schema) return false;
+        if (enabled) return true;
+        transforms ??= adapter.mayTransform?.(schema) ?? true;
+        return transforms;
+    };
+}
+
 function createWrapper(
     adapter: AnyAdapter,
     func: AnyFunction,
     { input, output, inputPath = DEFAULT_INPUT_PATH, outputPath = DEFAULT_OUTPUT_PATH }: AnyFunctionOptions,
     flags: ValidationFlagsGetter
 ): AnyFunction {
+    const runInput = validationGate(adapter, input);
+    const runOutput = validationGate(adapter, output);
+
     const wrapper: AnyFunction = (...args) => {
         // The flags are read on every call, so changes to them affect existing wrappers.
         const { input: validateInput, output: validateOutput } = flags();
-        const parsedArgs = input && validateInput ? checked(adapter, wrapper, standardValidate(input, args), inputPath) : args;
+        const parsedArgs = runInput(validateInput) ? checked(adapter, wrapper, standardValidate(input!, args), inputPath) : args;
         // Errors thrown by the function itself propagate unchanged.
         const result = func(...parsedArgs);
-        return output && validateOutput ? checked(adapter, wrapper, standardValidate(output, result), outputPath) : result;
+        return runOutput(validateOutput) ? checked(adapter, wrapper, standardValidate(output!, result), outputPath) : result;
     };
 
     return wrapper;
@@ -89,12 +108,15 @@ function createAsyncWrapper(
     { input, output, inputPath = DEFAULT_INPUT_PATH, outputPath = DEFAULT_OUTPUT_PATH }: AnyFunctionOptions,
     flags: ValidationFlagsGetter
 ): (...args: unknown[]) => Promise<unknown> {
+    const runInput = validationGate(adapter, input);
+    const runOutput = validationGate(adapter, output);
+
     const wrapper = async (...args: unknown[]): Promise<unknown> => {
         const { input: validateInput, output: validateOutput } = flags();
-        const parsedArgs = input && validateInput ? checked(adapter, wrapper, await standardValidateAsync(input, args), inputPath) : args;
+        const parsedArgs = runInput(validateInput) ? checked(adapter, wrapper, await standardValidateAsync(input!, args), inputPath) : args;
         // The function may be sync or async. Its resolved value is what gets validated.
         const result = await func(...parsedArgs);
-        return output && validateOutput ? checked(adapter, wrapper, await standardValidateAsync(output, result), outputPath) : result;
+        return runOutput(validateOutput) ? checked(adapter, wrapper, await standardValidateAsync(output!, result), outputPath) : result;
     };
 
     return wrapper;

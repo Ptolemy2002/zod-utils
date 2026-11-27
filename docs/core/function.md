@@ -65,7 +65,7 @@ If `input` or `output` coerce or transform their values, the original function r
 
 Errors thrown by the function itself (including validation errors from schemas it uses internally) are rethrown unchanged.
 
-Input and output validation can each be disabled globally with [`setFunctionValidation`](./functionValidation.md). When disabled, the corresponding schema (including its coercions and transforms) is skipped.
+Input and output validation can each be disabled globally with [`setFunctionValidation`](./functionValidation.md). When disabled, the corresponding schema is skipped, unless it may transform the value.
 
 ## Parameters
 **Direct**

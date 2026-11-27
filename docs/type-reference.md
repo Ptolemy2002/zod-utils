@@ -130,6 +130,7 @@ type SchemaAdapter<
     createError(issues: ReadonlyArray<SchemaIssue>): Err;
     createSchema<O>(parse: SchemaParser<O>): ApplySchemaKind<Kind, O>;
     createAsyncSchema<O>(parse: AsyncSchemaParser<O>): ApplySchemaKind<Kind, O>;
+    mayTransform?(schema: StandardSchemaV1): boolean;
 };
 
 // The object returned by createSchemaUtils (see docs/core/adapter.md).
