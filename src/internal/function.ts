@@ -2,9 +2,10 @@ import isCallable from "is-callable";
 import type { SchemaAdapter } from "src/core/adapter";
 import { hasIssues } from "src/core/error";
 import { interpretError } from "src/core/interpret";
+import { getFunctionValidation } from "src/core/functionValidation";
 import { normalizeIssuePath, prefixIssuePath } from "src/core/path";
 import {
-    ArgsSchema, FunctionSchemaOptions, FunctionTrial, SchemaIssue, SchemaPath,
+    ArgsSchema, FunctionSchemaOptions, FunctionTrial, FunctionValidationFlags, SchemaIssue, SchemaPath,
     StandardSchemaV1, ValidatedFunctionOptions, ValidationOutcome
 } from "src/core/types";
 import { standardValidate, standardValidateAsync } from "src/internal/standardValidate";
@@ -56,38 +57,61 @@ function checked<O>(adapter: AnyAdapter, wrapper: object, outcome: ValidationOut
     throw err;
 }
 
-export function validatedFunction(
-    adapter: AnyAdapter,
-    func: unknown,
-    { input, output, inputPath = DEFAULT_INPUT_PATH, outputPath = DEFAULT_OUTPUT_PATH }: ValidatedFunctionOptions<ArgsSchema, StandardSchemaV1> = {}
-): AnyFunction {
-    assertCallable(adapter, func);
+type AnyFunctionOptions = ValidatedFunctionOptions<ArgsSchema, StandardSchemaV1>;
+type ValidationFlagsGetter = () => Readonly<FunctionValidationFlags>;
 
+// Trials always validate both the input and the output, regardless of the global flags,
+// since they are explicit checks of the function's behavior.
+const ALWAYS_VALIDATE: FunctionValidationFlags = Object.freeze({ input: true, output: true });
+const alwaysValidate: ValidationFlagsGetter = () => ALWAYS_VALIDATE;
+
+function createWrapper(
+    adapter: AnyAdapter,
+    func: AnyFunction,
+    { input, output, inputPath = DEFAULT_INPUT_PATH, outputPath = DEFAULT_OUTPUT_PATH }: AnyFunctionOptions,
+    flags: ValidationFlagsGetter
+): AnyFunction {
     const wrapper: AnyFunction = (...args) => {
-        const parsedArgs = input ? checked(adapter, wrapper, standardValidate(input, args), inputPath) : args;
+        // The flags are read on every call, so changes to them affect existing wrappers.
+        const { input: validateInput, output: validateOutput } = flags();
+        const parsedArgs = input && validateInput ? checked(adapter, wrapper, standardValidate(input, args), inputPath) : args;
         // Errors thrown by the function itself propagate unchanged.
         const result = func(...parsedArgs);
-        return output ? checked(adapter, wrapper, standardValidate(output, result), outputPath) : result;
+        return output && validateOutput ? checked(adapter, wrapper, standardValidate(output, result), outputPath) : result;
     };
 
     return wrapper;
 }
 
-export function validatedFunctionAsync(
+function createAsyncWrapper(
     adapter: AnyAdapter,
-    func: unknown,
-    { input, output, inputPath = DEFAULT_INPUT_PATH, outputPath = DEFAULT_OUTPUT_PATH }: ValidatedFunctionOptions<ArgsSchema, StandardSchemaV1> = {}
+    func: AnyFunction,
+    { input, output, inputPath = DEFAULT_INPUT_PATH, outputPath = DEFAULT_OUTPUT_PATH }: AnyFunctionOptions,
+    flags: ValidationFlagsGetter
 ): (...args: unknown[]) => Promise<unknown> {
-    assertCallable(adapter, func);
-
     const wrapper = async (...args: unknown[]): Promise<unknown> => {
-        const parsedArgs = input ? checked(adapter, wrapper, await standardValidateAsync(input, args), inputPath) : args;
+        const { input: validateInput, output: validateOutput } = flags();
+        const parsedArgs = input && validateInput ? checked(adapter, wrapper, await standardValidateAsync(input, args), inputPath) : args;
         // The function may be sync or async. Its resolved value is what gets validated.
         const result = await func(...parsedArgs);
-        return output ? checked(adapter, wrapper, await standardValidateAsync(output, result), outputPath) : result;
+        return output && validateOutput ? checked(adapter, wrapper, await standardValidateAsync(output, result), outputPath) : result;
     };
 
     return wrapper;
+}
+
+export function validatedFunction(adapter: AnyAdapter, func: unknown, options: AnyFunctionOptions = {}): AnyFunction {
+    assertCallable(adapter, func);
+    return createWrapper(adapter, func, options, getFunctionValidation);
+}
+
+export function validatedFunctionAsync(
+    adapter: AnyAdapter,
+    func: unknown,
+    options: AnyFunctionOptions = {}
+): (...args: unknown[]) => Promise<unknown> {
+    assertCallable(adapter, func);
+    return createAsyncWrapper(adapter, func, options, getFunctionValidation);
 }
 
 type ResolvedTrial = {
@@ -184,10 +208,13 @@ export function functionSchema(
     return adapter.createSchema((value): ValidationOutcome<AnyFunction> => {
         if (!isCallable(value)) return { issues: notCallableIssues(value) };
 
-        const func = validatedFunction(adapter, value, options);
+        const func = createWrapper(adapter, value, options, getFunctionValidation);
         // The function is never called when there are no trials, since
         // functions with side effects would be problematic to test.
-        const issues = trials.flatMap((trial, i) => runTrial(func, trial, i));
+        if (trials.length === 0) return { value: func };
+
+        const trialFunc = createWrapper(adapter, value, options, alwaysValidate);
+        const issues = trials.flatMap((trial, i) => runTrial(trialFunc, trial, i));
 
         return issues.length > 0 ? { issues } : { value: func };
     });
@@ -200,12 +227,15 @@ export function functionSchemaAsync(
     return adapter.createAsyncSchema(async (value): Promise<ValidationOutcome<(...args: unknown[]) => Promise<unknown>>> => {
         if (!isCallable(value)) return { issues: notCallableIssues(value) };
 
-        const func = validatedFunctionAsync(adapter, value, options);
+        const func = createAsyncWrapper(adapter, value, options, getFunctionValidation);
+        if (trials.length === 0) return { value: func };
+
+        const trialFunc = createAsyncWrapper(adapter, value, options, alwaysValidate);
 
         // Trials run one at a time, in order, so that side effects and issue order are predictable.
         const issues: SchemaIssue[] = [];
         for (const [i, trial] of trials.entries()) {
-            issues.push(...await runTrialAsync(func, trial, i));
+            issues.push(...await runTrialAsync(trialFunc, trial, i));
         }
 
         return issues.length > 0 ? { issues } : { value: func };

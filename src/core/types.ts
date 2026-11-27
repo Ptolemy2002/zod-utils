@@ -75,6 +75,12 @@ export type ValidatedFunctionOptions<In extends ArgsSchema, Out extends Standard
     outputPath?: SchemaPath;
 };
 
+/** Global flags controlling whether validated functions validate their arguments and return values. */
+export type FunctionValidationFlags = {
+    input: boolean;
+    output: boolean;
+};
+
 export type ValidatedFunction<In extends ArgsSchema, Out extends StandardSchemaV1> =
     (...args: InferArgsInput<In>) => StandardSchemaV1.InferOutput<Out>;
 

@@ -75,6 +75,11 @@ type ValidatedFunctionOptions<In extends ArgsSchema, Out extends StandardSchemaV
     outputPath?: SchemaPath;
 };
 
+type FunctionValidationFlags = {
+    input: boolean;
+    output: boolean;
+};
+
 type ValidatedFunction<In extends ArgsSchema, Out extends StandardSchemaV1> =
     (...args: InferArgsInput<In>) => StandardSchemaV1.InferOutput<Out>;
 

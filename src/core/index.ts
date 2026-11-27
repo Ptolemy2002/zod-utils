@@ -4,3 +4,4 @@ export * from 'src/core/interpret';
 export * from 'src/core/error';
 export * from 'src/core/adapter';
 export * from 'src/core/standard';
+export * from 'src/core/functionValidation';
