@@ -38,6 +38,7 @@ export const standardAdapter: SchemaAdapter<StandardSchemaV1, SchemaValidationEr
     createError: (issues) => new SchemaValidationError(issues),
     createSchema: (parse) => createStandardSchema(parse),
     createAsyncSchema: (parse) => createStandardSchema(parse),
+    // No `mayTransform`: schemas from arbitrary libraries cannot be inspected, so they are never skipped.
 };
 
 export const standardUtils = createSchemaUtils(standardAdapter);

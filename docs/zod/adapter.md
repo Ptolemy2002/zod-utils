@@ -22,6 +22,9 @@ The [`SchemaAdapter`](../core/adapter.md#schemaadapter) for Zod. It accepts Zod 
 - `isError`: [`isZodError`](./typeGuards.md).
 - `createError(issues: ReadonlyArray<SchemaIssue>) => ZodError`: Creates a `ZodError`. Issues without a `code` get the code `"custom"`, and `{ key }` path segments are normalized to plain keys.
 - `createSchema` / `createAsyncSchema`: Return `z.any().transform(...)` schemas that add the parser's issues to the transform context on failure. Schemas from `createAsyncSchema` must be parsed with `parseAsync` / `safeParseAsync`.
+- `mayTransform(schema: StandardSchemaV1) => boolean`: Inspects a Zod schema (classic, `zod/mini` or core), including nested schemas, and returns `true` if it may change the value it validates. That is the case if it contains a transform, a codec, `z.preprocess`, coercion (`z.coerce.*`), a default, prefault or catch, `.readonly()`, an overwrite check (such as `.trim()`, `.toLowerCase()` or `.overwrite()`), a function, promise or `z.success` schema, or a schema type it does not recognize. Refinements never count as transforms. Returns `true` for schemas from other libraries.
+
+  Object schemas that strip unknown keys (the default for `z.object`) are not counted as transforms, even though their output omits keys that are not in the shape and is a new object.
 
 # zodUtils
 ```typescript

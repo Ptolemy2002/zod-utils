@@ -40,6 +40,7 @@ type SchemaAdapter<
     createError(issues: ReadonlyArray<SchemaIssue>): Err;
     createSchema<O>(parse: SchemaParser<O>): ApplySchemaKind<Kind, O>;
     createAsyncSchema<O>(parse: AsyncSchemaParser<O>): ApplySchemaKind<Kind, O>;
+    mayTransform?(schema: StandardSchemaV1): boolean;
 };
 
 interface StandardSchemaKind extends SchemaKind {
@@ -69,6 +70,7 @@ The contract each supported schema library implements.
 - `createError(issues: ReadonlyArray<SchemaIssue>) => Err`: Creates the library's validation error. The issues may lack a `code` and may contain `{ key }` path segments, so the adapter should normalize them as needed.
 - `createSchema<O>(parse: SchemaParser<O>) => ApplySchemaKind<Kind, O>`: Wraps `parse` in a schema of the library's type. When `parse` returns `{ issues }`, the schema must fail with those issues. Otherwise it must succeed with `value`.
 - `createAsyncSchema<O>(parse: AsyncSchemaParser<O>) => ApplySchemaKind<Kind, O>`: The same as `createSchema`, but `parse` is asynchronous.
+- `mayTransform(schema: StandardSchemaV1) => boolean` (optional): Returns `false` only if `schema` is known to never change the value it validates (no transforms, coercions, defaults, and so on). When input or output validation is disabled with [`setFunctionValidation`](./functionValidation.md), schemas for which this returns `true` still run, so that their transforms are preserved. If omitted, every schema is assumed to possibly transform, so the flags never skip a schema. When unsure, return `true`.
 
 ## SchemaKind
 TypeScript cannot express "a schema of output type `O`" generically, so an adapter describes its schema type with an interface that extends `SchemaKind` and refers to `this["Output"]`. `ApplySchemaKind<Kind, O>` substitutes `O` for `Output` and reads `Schema`:
@@ -134,6 +136,8 @@ Builds the full set of utilities for a schema library from its adapter. Every su
 const standardAdapter: SchemaAdapter<StandardSchemaV1, SchemaValidationError, StandardSchemaKind>
 ```
 The library-neutral adapter. It accepts any Standard Schema, throws [`SchemaValidationError`](./error.md), and creates plain Standard Schema objects whose `vendor` is `STANDARD_SCHEMA_VENDOR` (`"@ptolemy2002/zod-utils"`). These objects can be passed to any utility or third-party code that accepts Standard Schemas, but they cannot be nested inside another library's schemas. Use that library's adapter for that.
+
+It has no `mayTransform`, since schemas from arbitrary libraries cannot be inspected, so the library-neutral function utilities always run their schemas, even when validation is disabled with [`setFunctionValidation`](./functionValidation.md). Use a library's own adapter (such as the [Zod versions](../zod/function.md)) for its schemas to be skipped.
 
 `standardUtils` is `createSchemaUtils(standardAdapter)`. Its members are also exported individually: `validate`, `validateAsync`, `validateWithErrors`, `validateWithErrorsAsync`, `validatedFunction`, `validatedFunctionAsync`, `functionSchema` and `functionSchemaAsync`.
 

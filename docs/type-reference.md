@@ -75,6 +75,11 @@ type ValidatedFunctionOptions<In extends ArgsSchema, Out extends StandardSchemaV
     outputPath?: SchemaPath;
 };
 
+type FunctionValidationFlags = {
+    input: boolean;
+    output: boolean;
+};
+
 type ValidatedFunction<In extends ArgsSchema, Out extends StandardSchemaV1> =
     (...args: InferArgsInput<In>) => StandardSchemaV1.InferOutput<Out>;
 
@@ -125,6 +130,7 @@ type SchemaAdapter<
     createError(issues: ReadonlyArray<SchemaIssue>): Err;
     createSchema<O>(parse: SchemaParser<O>): ApplySchemaKind<Kind, O>;
     createAsyncSchema<O>(parse: AsyncSchemaParser<O>): ApplySchemaKind<Kind, O>;
+    mayTransform?(schema: StandardSchemaV1): boolean;
 };
 
 // The object returned by createSchemaUtils (see docs/core/adapter.md).

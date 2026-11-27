@@ -49,6 +49,8 @@ These are the Zod versions of the [function utilities](../core/function.md), cre
 - Validation failures, and non-callable values passed to `zodValidatedFunction`, throw a `ZodError`.
 - `zodFunctionSchema` and `zodFunctionSchemaAsync` return Zod schemas (`z.any().transform(...)`), so they can be nested in other Zod schemas. Non-callable values fail with an `invalid_type` issue.
 
+The global [function validation flags](../core/functionValidation.md) apply to these functions too. They are exported from every import path (root, `/core` and `/zod`), and are shared by every adapter.
+
 # zodValidatedFunction
 ```typescript
 function zodValidatedFunction<

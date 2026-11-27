@@ -70,12 +70,13 @@ ZOD_CONSUMER='
 import * as z from "zod";
 import * as root from "PACKAGE";
 import { validate } from "PACKAGE/core";
-import { zodFunctionSchema, zodValidate } from "PACKAGE/zod";
+import { FunctionValidationFlags, setFunctionValidation, zodFunctionSchema, zodValidate } from "PACKAGE/zod";
 
 const fn: (s: string) => number = zodFunctionSchema({ input: z.tuple([z.string()]), output: z.number() })
     .parse((s: string) => s.length);
 const ok: boolean = zodValidate(z.string())("x") && validate(z.string())("x") && root.zodValidate(z.string())("x");
-export { fn, ok };
+const flags: FunctionValidationFlags = setFunctionValidation({ output: false });
+export { fn, ok, flags };
 '
 
 echo "Consumer without Zod"
@@ -105,6 +106,7 @@ check "the root path, /core and /zod load at runtime" node -e "
     const zod = require('$PACKAGE/zod');
     if (root.validate !== core.validate || root.zodValidate !== zod.zodValidate) throw new Error('exports differ');
     if (!zod.zodValidate(z.string())('x')) throw new Error('validation failed');
+    if (zod.setFunctionValidation !== core.setFunctionValidation) throw new Error('/zod and /core have separate function validation flags');
 "
 check_types "$WITH_ZOD" zod-consumer.ts
 

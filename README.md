@@ -9,6 +9,7 @@ The utilities are built on a small adapter layer: each supported library provide
   - [adapter](docs/core/adapter.md) - The `SchemaAdapter` contract, `createSchemaUtils`, and the library-neutral `standardAdapter`
   - [validate](docs/core/validate.md) - Schema-wrapping factories for creating validators (sync and async)
   - [function](docs/core/function.md) - Validated function wrappers and function schemas with trials (sync and async)
+  - [functionValidation](docs/core/functionValidation.md) - Global flags to enable or disable input and output validation of validated functions
   - [interpret](docs/core/interpret.md) - Utilities for formatting validation errors as strings
   - [path](docs/core/path.md) - Utilities for normalizing, comparing, and prefixing issue paths
   - [error](docs/core/error.md) - `SchemaValidationError`, `AsyncSchemaError`, and related type guards

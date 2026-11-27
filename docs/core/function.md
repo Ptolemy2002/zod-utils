@@ -65,6 +65,8 @@ If `input` or `output` coerce or transform their values, the original function r
 
 Errors thrown by the function itself (including validation errors from schemas it uses internally) are rethrown unchanged.
 
+Input and output validation can each be disabled globally with [`setFunctionValidation`](./functionValidation.md). When disabled, the corresponding schema is skipped, unless it may transform the value.
+
 ## Parameters
 **Direct**
 - `func` (`unknown`): The value to validate and wrap.
@@ -104,7 +106,7 @@ function functionSchema<
 ```
 Factory that returns a schema which parses any value into a validated wrapper function (as created by [`validatedFunction`](#validatedfunction)). Validation fails with an `invalid_type` issue if the value is not callable.
 
-If `trials` are provided, the function is called once per trial at parse time to check its behavior. Each trial's issues are prefixed with the trial's `id` in the issue path. The function is never called at parse time if `trials` is empty. This is useful for checking overload behavior, but should not be used if the function may have side effects.
+If `trials` are provided, the function is called once per trial at parse time to check its behavior. Each trial's issues are prefixed with the trial's `id` in the issue path. The function is never called at parse time if `trials` is empty. This is useful for checking overload behavior, but should not be used if the function may have side effects. Trials always validate the input and output, even if validation is disabled globally with [`setFunctionValidation`](./functionValidation.md).
 
 ## Parameters
 **Direct**
